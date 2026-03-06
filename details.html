@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Vehicle Handover/Takeover | OnPoint OnTime Fleet</title>
+    <style>
+        /* Copy all your existing styles here - they remain the same */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .form-section {
+            padding: 20px;
+            border-bottom: 1px solid #eef2f6;
+        }
+
+        .form-section h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-section h2 i {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #eef2f6;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 10px 0;
+        }
+
+        .radio-option {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-option label {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            background: #f8fafc;
+            border: 2px solid #eef2f6;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 10px 0;
+        }
+
+        .checkbox-item {
+            position: relative;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            display: none;
+        }
+
+        .checkbox-item label {
+            display: block;
+            text-align: center;
+            padding: 15px;
+            background: #f8fafc;
+            border: 2px solid #eef2f6;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .checkbox-item input[type="checkbox"]:checked + label {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .photo-upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .photo-upload-area:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .photo-upload-area input[type="file"] {
+            display: none;
+        }
+
+        .photo-upload-area label {
+            display: block;
+            cursor: pointer;
+        }
+
+        .photo-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .preview-image {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #eef2f6;
+        }
+
+        .abnormality-item {
+            background: #fff9c4;
+            border-left: 4px solid #fbc02d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .abnormality-item textarea {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border: 2px solid #eef2f6;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            display: none;
+            background: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .error-message {
+            background: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .datetime-group {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #eef2f6;
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        @media (max-width: 480px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+            }
+            
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            .home{
+                color: blue;
+                text-align: center;
+                margin-left: 200px;
+                font-size: 15px;
+                
+            }
+            .home:hover{
+                color: green;
+                cursor: pointer;
+                transition: 0.7s;
+                opacity: 0.8;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Vehicle Handover/Takeover Report</h1>
+            <p>OnPoint OnTime Fleet Solutions</p>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            ✅ Form submitted successfully! Data saved to Google Drive and Sheets.
+        </div>
+
+        <div class="error-message" id="errorMessage" style="display: none;">
+            ❌ Error submitting form. Please try again.
+        </div>
+
+        <form id="vehicleForm">
+            <!-- Employee Information Section -->
+            <div class="form-section">
+                <h2><i>👤</i> Employee Information</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Name and Surname *</label>
+                        <input type="text" id="employeeName" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Employee Number *</label>
+                        <input type="text" id="employeeNumber" placeholder="EMP001" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>ID Number *</label>
+                    <input type="text" id="idNumber" placeholder="900101 5084 089" required>
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <select id="department">
+                        <option value="">Select Department</option>
+                        <option value="Logistics">Logistics</option>
+                        <option value="Sales">Sales</option>
+                        <option value="Management">Management</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Vehicle Information Section -->
+            <div class="form-section">
+                <h2><i>🚙</i> Vehicle Information</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Vehicle Registration *</label>
+                        <input type="text" id="vehicleReg" placeholder="CA 123-456" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Vehicle Model</label>
+                        <input type="text" id="vehicleModel" placeholder="Toyota Hilux 2023">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Current Mileage *</label>
+                        <input type="number" id="mileage" placeholder="45000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Next Service Due</label>
+                        <input type="text" id="serviceDue" placeholder="50000 km">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Handover/Takeover Type -->
+            <div class="form-section">
+                <h2><i>🔄</i> Handover/Takeover Type</h2>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" name="handoverType" id="handover" value="Handover" checked>
+                        <label for="handover">Handover</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="handoverType" id="takeover" value="Takeover">
+                        <label for="takeover">Takeover</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fuel Gauge Position -->
+            <div class="form-section">
+                <h2><i>⛽</i> Fuel Gauge Position</h2>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" name="fuelLevel" id="empty" value="Empty">
+                        <label for="empty">Empty</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="fuelLevel" id="quarter" value="1/4">
+                        <label for="quarter">1/4</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="fuelLevel" id="half" value="1/2" checked>
+                        <label for="half">1/2</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="fuelLevel" id="threeQuarter" value="3/4">
+                        <label for="threeQuarter">3/4</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="fuelLevel" id="full" value="Full">
+                        <label for="full">Full</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- General Handover/Takeover Checklist -->
+            <div class="form-section">
+                <h2><i>✓</i> General Handover/Takeover Checklist</h2>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" name="checklist" id="keys" value="Keys">
+                        <label for="keys">🔑 Keys</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" name="checklist" id="license" value="License Disk">
+                        <label for="license">📄 License Disk</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" name="checklist" id="spareTire" value="Spare Tire">
+                        <label for="spareTire">🛞 Spare Tire</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" name="checklist" id="jack" value="Jack">
+                        <label for="jack">🔧 Jack</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" name="checklist" id="triangle" value="Warning Triangle">
+                        <label for="triangle">⚠️ Warning Triangle</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" name="checklist" id="firstAid" value="First Aid Kit">
+                        <label for="firstAid">🩺 First Aid Kit</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" name="checklist" id="fireExtinguisher" value="Fire Extinguisher">
+                        <label for="fireExtinguisher">🧯 Fire Extinguisher</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" name="checklist" id="fuelCard" value="Fuel Card">
+                        <label for="fuelCard">💳 Fuel Card</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Abnormalities and Photo Uploads -->
+            <div class="form-section">
+                <h2><i>📸</i> Abnormalities / Damage Report</h2>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Please document any dents, scratches, or abnormalities</p>
+                
+                <!-- Photo Upload Area -->
+                <div class="photo-upload-area" id="photoUploadArea">
+                    <input type="file" id="vehiclePhotos" accept="image/*" multiple capture="environment">
+                    <label for="vehiclePhotos">
+                        <div style="font-size: 40px; margin-bottom: 10px;">📷</div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">Tap to take photos</div>
+                        <div style="font-size: 12px; color: #888;">Upload images of any damage or abnormalities</div>
+                    </label>
+                </div>
+
+                <!-- Photo Preview -->
+                <div class="photo-preview" id="photoPreview"></div>
+
+                <!-- Upload Progress -->
+                <div class="progress-bar" id="progressBar" style="display: none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <!-- Abnormality Description -->
+                <div class="abnormality-item">
+                    <label style="font-weight: 600; margin-bottom: 10px; display: block;">Damage/Abnormality Description</label>
+                    <textarea id="abnormalityDesc" rows="3" placeholder="Please describe any dents, scratches, or other issues..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Location of Damage (if applicable)</label>
+                    <select id="damageLocation">
+                        <option value="">Select location</option>
+                        <option value="Front Bumper">Front Bumper</option>
+                        <option value="Rear Bumper">Rear Bumper</option>
+                        <option value="Driver Side">Driver Side</option>
+                        <option value="Passenger Side">Passenger Side</option>
+                        <option value="Hood">Hood</option>
+                        <option value="Trunk">Trunk</option>
+                        <option value="Roof">Roof</option>
+                        <option value="Wheels/Tires">Wheels/Tires</option>
+                        <option value="Windshield">Windshield</option>
+                        <option value="Interior">Interior</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Date and Time -->
+            <div class="form-section">
+                <h2><i>⏰</i> Date & Time</h2>
+                <div class="datetime-group">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date *</label>
+                            <input type="date" id="handoverDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Time *</label>
+                            <input type="time" id="handoverTime" required>
+                        </div>
+                    </div>
+                </div><br><br>
+            </div>
+            <a class="home" href="index.html">Home Page</a><br><br>
+
+            <!-- Additional Notes -->
+            <div class="form-section">
+                <h2><i>📝</i> Additional Notes</h2>
+                <div class="form-group">
+                    <textarea id="additionalNotes" rows="3" placeholder="Any additional information or comments..."></textarea>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div style="padding: 20px;">
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    📤 Submit to Google Drive & Sheets
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div style="color: #333; font-weight: 600;" id="loadingText">Sending report...</div>
+    </div>
+
+    <script>
+        // Google Apps Script Web App URL - REPLACE WITH YOUR DEPLOYED URL
+        const GAS_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
+        
+        // Set default date and time
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('handoverDate').value = today;
+            
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('handoverTime').value = `${hours}:${minutes}`;
+        });
+
+        // Photo upload preview
+        document.getElementById('vehiclePhotos').addEventListener('change', function(e) {
+            const preview = document.getElementById('photoPreview');
+            preview.innerHTML = '';
+            
+            for(let i = 0; i < this.files.length; i++) {
+                const file = this.files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'preview-image';
+                    preview.appendChild(img);
+                }
+                
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Update progress bar
+        function updateProgress(percentage) {
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            progressBar.style.display = 'block';
+            progressFill.style.width = percentage + '%';
+        }
+
+        // Form submission
+        document.getElementById('vehicleForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validate required fields
+            const requiredFields = ['employeeName', 'employeeNumber', 'idNumber', 'vehicleReg', 'mileage', 'handoverDate', 'handoverTime'];
+            for(let field of requiredFields) {
+                if(!document.getElementById(field).value) {
+                    alert(`Please fill in all required fields`);
+                    return;
+                }
+            }
+
+            // Show loading overlay
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+
+            try {
+                // Collect form data
+                const formData = {
+                    timestamp: new Date().toISOString(),
+                    employeeName: document.getElementById('employeeName').value,
+                    employeeNumber: document.getElementById('employeeNumber').value,
+                    idNumber: document.getElementById('idNumber').value,
+                    department: document.getElementById('department').value || 'Not specified',
+                    vehicleReg: document.getElementById('vehicleReg').value,
+                    vehicleModel: document.getElementById('vehicleModel').value || 'Not specified',
+                    mileage: document.getElementById('mileage').value,
+                    serviceDue: document.getElementById('serviceDue').value || 'Not specified',
+                    handoverType: document.querySelector('input[name="handoverType"]:checked')?.value || 'Handover',
+                    fuelLevel: document.querySelector('input[name="fuelLevel"]:checked')?.value || '1/2',
+                    checklist: Array.from(document.querySelectorAll('input[name="checklist"]:checked')).map(cb => cb.value).join(', ') || 'None',
+                    abnormalityDesc: document.getElementById('abnormalityDesc').value || 'No abnormalities reported',
+                    damageLocation: document.getElementById('damageLocation').value || 'Not applicable',
+                    handoverDate: document.getElementById('handoverDate').value,
+                    handoverTime: document.getElementById('handoverTime').value,
+                    additionalNotes: document.getElementById('additionalNotes').value || 'None'
+                };
+
+                // Handle photos
+                const photoFiles = document.getElementById('vehiclePhotos').files;
+                const photos = [];
+
+                if (photoFiles.length > 0) {
+                    document.getElementById('loadingText').textContent = 'Uploading photos...';
+                    
+                    for (let i = 0; i < photoFiles.length; i++) {
+                        const file = photoFiles[i];
+                        const base64 = await fileToBase64(file);
+                        photos.push({
+                            name: file.name,
+                            type: file.type,
+                            data: base64
+                        });
+                        
+                        // Update progress
+                        const progress = ((i + 1) / photoFiles.length) * 100;
+                        updateProgress(progress);
+                    }
+                }
+
+                // Prepare data for Google Apps Script
+                const payload = {
+                    formData: formData,
+                    photos: photos,
+                    driveFolderId: '13BuqOSAdUlfZJIm36A_R3mbF4HwHCfZY', // Your Google Drive folder ID
+                    sheetId: '1vhtaNNmY-YsyDiaA2IFodoBYdQsEcL09F7BgMJo4utI' // Your Google Sheet ID
+                };
+
+                document.getElementById('loadingText').textContent = 'Saving to Google Drive and Sheets...';
+
+                // Send to Google Apps Script
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Important for Google Apps Script
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('progressBar').style.display = 'none';
+
+                // Show success message
+                const successMsg = document.getElementById('successMessage');
+                successMsg.style.display = 'block';
+                
+                // Log for debugging
+                console.log('Form submitted successfully to Google Apps Script');
+
+                // Auto-hide success message after 5 seconds
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 5000);
+
+                // Reset form
+                if(confirm('Form submitted successfully! Would you like to reset the form for another entry?')) {
+                    this.reset();
+                    document.getElementById('handoverDate').value = new Date().toISOString().split('T')[0];
+                    document.getElementById('handoverTime').value = `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`;
+                    document.getElementById('photoPreview').innerHTML = '';
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('progressBar').style.display = 'none';
+                
+                // Show error message
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('errorMessage').textContent = 'Error submitting form: ' + error.message;
+            }
+        });
+
+        // Drag and drop for photo upload (mobile friendly)
+        const photoArea = document.getElementById('photoUploadArea');
+        photoArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            photoArea.style.borderColor = '#667eea';
+            photoArea.style.background = '#f0f4ff';
+        });
+
+        photoArea.addEventListener('dragleave', () => {
+            photoArea.style.borderColor = '#cbd5e0';
+            photoArea.style.background = '#f8fafc';
+        });
+
+        photoArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            photoArea.style.borderColor = '#cbd5e0';
+            photoArea.style.background = '#f8fafc';
+            
+            const files = e.dataTransfer.files;
+            if(files.length > 0) {
+                document.getElementById('vehiclePhotos').files = files;
+                // Trigger change event
+                const event = new Event('change', { bubbles: true });
+                document.getElementById('vehiclePhotos').dispatchEvent(event);
+            }
+        });
+
+        // Add touch optimization for mobile
+        if('ontouchstart' in window) {
+            document.querySelectorAll('input, select, textarea').forEach(element => {
+                element.style.fontSize = '16px'; // Prevent zoom on iOS
+            });
+        }
+    </script>
+</body>
+</html>
