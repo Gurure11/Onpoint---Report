@@ -417,7 +417,7 @@
                     </div>
                     <div class="form-group">
                         <label>Vehicle Model</label>
-                        <input type="text" id="vehicleModel" placeholder="Toyota Hilux 2023" value="Auto-filled from database">
+                        <input type="text" id="vehicleModel" placeholder="Toyota Hilux 2023">
                     </div>
                 </div>
                 <div class="form-row">
@@ -569,9 +569,8 @@
                             <input type="time" id="handoverTime" required>
                         </div>
                     </div>
-                </div><br><br>
+                </div>
             </div>
-            <a class="home" href="index.html">Home Page</a><br><br>
 
             <!-- Additional Notes -->
             <div class="form-section">
@@ -581,8 +580,9 @@
                 </div>
             </div>
 
-            <!-- Submit Button -->
-            <div style="padding: 20px;">
+            <!-- Home Link and Submit Button -->
+            <div style="padding: 20px; text-align: center;">
+                <a href="index.html" class="home" style="color: #667eea; text-decoration: none; display: inline-block; margin-bottom: 15px;">🏠 Home Page</a>
                 <button type="submit" class="submit-btn" id="submitBtn">
                     📧 Send Report to fleet@onpointontime.co.za
                 </button>
@@ -597,9 +597,16 @@
     </div>
 
     <script>
-        // === GOOGLE APPS SCRIPT WEB APP URL (https://script.google.com/macros/s/AKfycbztFUEoR4E3L_juGd1CsDUdyLuD6DRKT6e-bmXu1S2C_qL3e1JwPpoVzOOFk0iF11OC/exec) ===
-        // IMPORTANT: Replace with your actual web app URL after deploying the Apps Script.
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbztFUEoR4E3L_juGd1CsDUdyLuD6DRKT6e-bmXu1S2C_qL3e1JwPpoVzOOFk0iF11OC/exec'; // Example URL – YOU MUST REPLACE THIS
+        // Google Apps Script Web App URL - REPLACE WITH YOUR DEPLOYED URL
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbw_CQ_7K5cbGEnQJp7N1ttqC_7bS52qT1L2I5I-X00C7_7PmN_NkjCftMT-ijgJcC3G/exec';
+
+        // Configuration
+        const CONFIG = {
+            SHEET_ID: '1vBDeyPBy3LLYg0EM2OFgceI3deVFhXL2Nr-IpdveZoU',
+            DRIVE_FOLDER_ID: '13BuqOSAdUlfZJIm36A_R3mbF4HwHCfZY',
+            SHEET_NAME: 'Vehicle Handovers',
+            EMAIL_RECIPIENT: 'fleet@onpointontime.co.za'
+        };
 
         // Set default date and time
         document.addEventListener('DOMContentLoaded', function() {
@@ -610,15 +617,6 @@
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             document.getElementById('handoverTime').value = `${hours}:${minutes}`;
-
-            // Auto-fill vehicle model (simulated)
-            const vehicleReg = document.getElementById('vehicleReg');
-            vehicleReg.addEventListener('input', function() {
-                if(this.value.length > 3) {
-                    // Simulated database lookup
-                    document.getElementById('vehicleModel').value = 'Toyota Hilux 2.8 GD-6';
-                }
-            });
         });
 
         // Photo upload preview
@@ -641,7 +639,7 @@
             }
         });
 
-        // Drag and drop for photo upload (mobile friendly)
+        // Drag and drop for photo upload
         const photoArea = document.getElementById('photoUploadArea');
         photoArea.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -674,7 +672,7 @@
             });
         }
 
-        // === FORM SUBMISSION HANDLER: Posts data & images to Google Sheets & Drive via Apps Script ===
+        // Form submission handler
         document.getElementById('vehicleForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -693,37 +691,54 @@
             document.getElementById('errorMessage').style.display = 'none';
 
             try {
-                // Prepare text fields as a JSON blob
+                // Prepare form data
                 const formData = {
+                    // Configuration
+                    sheetId: CONFIG.SHEET_ID,
+                    driveFolderId: CONFIG.DRIVE_FOLDER_ID,
+                    sheetName: CONFIG.SHEET_NAME,
+                    emailRecipient: CONFIG.EMAIL_RECIPIENT,
+                    
+                    // Employee Information
                     employeeName: document.getElementById('employeeName').value,
                     employeeNumber: document.getElementById('employeeNumber').value,
                     idNumber: document.getElementById('idNumber').value,
-                    department: document.getElementById('department').value,
+                    department: document.getElementById('department').value || 'Not Specified',
+                    
+                    // Vehicle Information
                     vehicleReg: document.getElementById('vehicleReg').value,
-                    vehicleModel: document.getElementById('vehicleModel').value,
+                    vehicleModel: document.getElementById('vehicleModel').value || 'Not Specified',
                     mileage: document.getElementById('mileage').value,
-                    serviceDue: document.getElementById('serviceDue').value,
+                    serviceDue: document.getElementById('serviceDue').value || 'Not Specified',
+                    
+                    // Handover Details
                     handoverType: document.querySelector('input[name="handoverType"]:checked')?.value || 'Handover',
                     fuelLevel: document.querySelector('input[name="fuelLevel"]:checked')?.value || '1/2',
-                    checklist: Array.from(document.querySelectorAll('input[name="checklist"]:checked')).map(cb => cb.value).join(', '),
-                    abnormalityDesc: document.getElementById('abnormalityDesc').value,
-                    damageLocation: document.getElementById('damageLocation').value,
+                    checklist: Array.from(document.querySelectorAll('input[name="checklist"]:checked')).map(cb => cb.value).join(', ') || 'None',
+                    
+                    // Damage Report
+                    abnormalityDesc: document.getElementById('abnormalityDesc').value || 'None',
+                    damageLocation: document.getElementById('damageLocation').value || 'Not Applicable',
+                    
+                    // Date and Time
                     handoverDate: document.getElementById('handoverDate').value,
                     handoverTime: document.getElementById('handoverTime').value,
-                    additionalNotes: document.getElementById('additionalNotes').value,
-                    // Google Drive folder ID (as provided)
-                    driveFolderId: '13BuqOSAdUlfZJIm36A_R3mbF4HwHCfZY',
-                    // Google Sheet ID (as provided)
-                    sheetId: '1vBDeyPBy3LLYg0EM2OFgceI3deVFhXL2Nr-IpdveZoU',
-                    timestamp: new Date().toISOString()
+                    
+                    // Additional
+                    additionalNotes: document.getElementById('additionalNotes').value || 'None',
+                    
+                    // Metadata
+                    submissionTimestamp: new Date().toISOString(),
+                    submissionId: 'HND-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9)
                 };
 
-                // Build multipart/form-data request to send both JSON and images
+                // Build multipart form data
                 const payload = new FormData();
-                // Append all text fields as a single JSON string (nested under "metadata")
-                payload.append('metadata', new Blob([JSON.stringify(formData)], { type: 'application/json' }));
+                
+                // Append metadata as JSON
+                payload.append('metadata', JSON.stringify(formData));
 
-                // Append each selected image file
+                // Append photos
                 const photoInput = document.getElementById('vehiclePhotos');
                 for (let i = 0; i < photoInput.files.length; i++) {
                     payload.append('photos', photoInput.files[i]);
@@ -736,13 +751,13 @@
                 });
 
                 let result;
-                const contentType = response.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    result = await response.json();
-                } else {
-                    // Handle plain text or error
-                    const text = await response.text();
-                    throw new Error(text || 'Invalid server response');
+                const responseText = await response.text();
+                
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    console.log('Response text:', responseText);
+                    throw new Error('Invalid server response');
                 }
 
                 if (result.status === 'success') {
@@ -750,7 +765,6 @@
                     document.getElementById('successMessage').style.display = 'block';
                     document.getElementById('errorMessage').style.display = 'none';
                     
-                    // Log for debugging
                     console.log('Submission successful:', result);
 
                     // Auto-hide success message after 5 seconds
@@ -758,16 +772,20 @@
                         document.getElementById('successMessage').style.display = 'none';
                     }, 5000);
 
-                    // Optional reset
-                    if(confirm('Form submitted successfully! Would you like to reset the form for another entry?')) {
+                    // Ask if user wants to reset form
+                    if(confirm('Form submitted successfully! A copy has been sent to fleet@onpointontime.co.za\n\nWould you like to reset the form for another entry?')) {
                         this.reset();
                         document.getElementById('handoverDate').value = new Date().toISOString().split('T')[0];
                         document.getElementById('handoverTime').value = 
                             `${String(new Date().getHours()).padStart(2,'0')}:${String(new Date().getMinutes()).padStart(2,'0')}`;
                         document.getElementById('photoPreview').innerHTML = '';
+                        
+                        // Re-check default radio buttons
+                        document.getElementById('handover').checked = true;
+                        document.getElementById('half').checked = true;
                     }
                 } else {
-                    throw new Error(result.message || 'Unknown error');
+                    throw new Error(result.message || 'Unknown error occurred');
                 }
             } catch (error) {
                 console.error('Submission error:', error);
