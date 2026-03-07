@@ -25,18 +25,6 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
         }
 
         .header {
@@ -65,7 +53,6 @@
             background: rgba(255, 255, 255, 0.2);
             padding: 10px 20px;
             border-radius: 50px;
-            backdrop-filter: blur(5px);
         }
 
         .user-avatar {
@@ -108,7 +95,6 @@
 
         .logout-btn:hover {
             background: #d32f2f;
-            transform: translateY(-2px);
         }
 
         .welcome-banner {
@@ -123,11 +109,6 @@
         .welcome-banner h2 {
             font-size: 28px;
             margin-bottom: 10px;
-        }
-
-        .welcome-banner p {
-            font-size: 16px;
-            opacity: 0.9;
         }
 
         .stats-grid {
@@ -230,10 +211,6 @@
             gap: 5px;
         }
 
-        .report-card .report-link:hover {
-            gap: 10px;
-        }
-
         .quick-actions {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -315,6 +292,35 @@
             color: #888;
         }
 
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -393,42 +399,42 @@
             </h2>
 
             <div class="reports-grid">
-                <div class="report-card" onclick="window.location.href='fuel-app.html'">
+                <div class="report-card" onclick="window.location.href='#'">
                     <div class="report-icon">⛽</div>
                     <h3>Fuel Filling Report</h3>
-                    <p>Track fuel consumption, efficiency, and costs per vehicle. Generate detailed fuel reports.</p>
+                    <p>Track fuel consumption, efficiency, and costs per vehicle.</p>
                     <div class="report-link">Access Report →</div>
                 </div>
 
-                <div class="report-card" onclick="window.location.href='vehicle-handover.html'">
+                <div class="report-card" onclick="window.location.href='#'">
                     <div class="report-icon">🚛</div>
                     <h3>Vehicle Handover</h3>
                     <p>Document vehicle handovers, track damages, and manage fleet assignments.</p>
                     <div class="report-link">Access Report →</div>
                 </div>
 
-                <div class="report-card" onclick="window.location.href='maintenance.html'">
+                <div class="report-card" onclick="window.location.href='#'">
                     <div class="report-icon">🔧</div>
                     <h3>Maintenance Log</h3>
                     <p>Track vehicle maintenance, service schedules, and repair history.</p>
                     <div class="report-link">Access Report →</div>
                 </div>
 
-                <div class="report-card" onclick="window.location.href='driver-performance.html'">
+                <div class="report-card" onclick="window.location.href='#'">
                     <div class="report-icon">👤</div>
                     <h3>Driver Performance</h3>
                     <p>Monitor driver efficiency, fuel usage, and driving patterns.</p>
                     <div class="report-link">Access Report →</div>
                 </div>
 
-                <div class="report-card" onclick="window.location.href='expense-tracker.html'">
+                <div class="report-card" onclick="window.location.href='#'">
                     <div class="report-icon">💰</div>
                     <h3>Expense Tracker</h3>
                     <p>Track all fleet expenses, including fuel, maintenance, and operational costs.</p>
                     <div class="report-link">Access Report →</div>
                 </div>
 
-                <div class="report-card" onclick="window.location.href='fleet-summary.html'">
+                <div class="report-card" onclick="window.location.href='#'">
                     <div class="report-icon">📊</div>
                     <h3>Fleet Summary</h3>
                     <p>Complete overview of your entire fleet with key performance indicators.</p>
@@ -442,19 +448,19 @@
             </h2>
 
             <div class="quick-actions">
-                <button class="action-btn" onclick="window.location.href='fuel-app.html'">
+                <button class="action-btn" onclick="window.location.href='#'">
                     <span>⛽</span>
                     Add Fuel Entry
                 </button>
-                <button class="action-btn" onclick="window.location.href='vehicle-handover.html'">
+                <button class="action-btn" onclick="window.location.href='#'">
                     <span>🚛</span>
                     New Handover
                 </button>
-                <button class="action-btn" onclick="window.location.href='maintenance.html'">
+                <button class="action-btn" onclick="window.location.href='#'">
                     <span>🔧</span>
                     Schedule Service
                 </button>
-                <button class="action-btn" onclick="window.location.href='reports.html'">
+                <button class="action-btn" onclick="window.location.href='#'">
                     <span>📊</span>
                     Generate Report
                 </button>
@@ -484,30 +490,16 @@
                             <div class="activity-time">1 hour ago</div>
                         </div>
                     </li>
-                    <li class="activity-item">
-                        <div class="activity-icon">📊</div>
-                        <div class="activity-details">
-                            <div class="activity-title">Monthly report generated</div>
-                            <div class="activity-time">3 hours ago</div>
-                        </div>
-                    </li>
                 </ul>
             </div>
         </div>
     </div>
 
     <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column;">
-        <div class="loading-spinner" style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;"></div>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
         <div style="color: #333; font-weight: 600;">Loading...</div>
     </div>
-
-    <style>
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
 
     <script>
         const CONFIG = {
@@ -542,7 +534,6 @@
 
         // Display user information
         function displayUserInfo(sessionData) {
-            // Set user name and role
             document.getElementById('userName').textContent = sessionData.fullName || sessionData.username;
             document.getElementById('userRole').textContent = sessionData.role || 'User';
             document.getElementById('welcomeName').textContent = sessionData.fullName || sessionData.username;
@@ -550,12 +541,7 @@
             // Set avatar initials
             const name = sessionData.fullName || sessionData.username;
             const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-            document.getElementById('userAvatar').textContent = initials;
-            
-            // If admin, show admin-specific content
-            if (sessionData.role === 'admin') {
-                document.querySelector('.admin-panel h2:first-of-type').innerHTML = '<span>👑</span> Admin Dashboard';
-            }
+            document.getElementById('userAvatar').textContent = initials || 'U';
         }
 
         // Logout function
@@ -564,9 +550,6 @@
             sessionStorage.removeItem('onpoint_session');
             window.location.href = 'login.html';
         }
-
-        // Make logout globally available
-        window.logout = logout;
     </script>
 </body>
 </html>
