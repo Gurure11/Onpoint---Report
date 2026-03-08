@@ -3,951 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Onpoint Fleet · Incident Dashboard</title>
-    <!-- Font Awesome 5 -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
-    <!-- Google Font Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <!-- Leaflet for maps (optional, if you want to show locations) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>Onpoint Fleet Dashboard</title>
+    <!-- Load minimal CSS first -->
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f4f7fc;
-            color: #1e293b;
-            line-height: 1.5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .dashboard-header {
-            background: #ffffff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02), 0 1px 3px rgba(0,0,0,0.05);
-            padding: 0.75rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid #e9edf4;
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo-icon {
-            background: #1e3a8a;
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.3rem;
-        }
-
-        .logo-text h1 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-            color: #0f182a;
-        }
-
-        .logo-text span {
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #5e6f8d;
-            background: #f0f4fa;
-            padding: 0.2rem 0.8rem;
-            border-radius: 30px;
-            margin-left: 0.5rem;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .home-btn, .logout-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1.2rem;
-            border-radius: 40px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            border: 1px solid transparent;
-            transition: all 0.15s ease;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .home-btn {
-            background: #f1f5f9;
-            color: #334155;
-            border-color: #dbe0e8;
-        }
-
-        .home-btn i {
-            color: #3b4e6b;
-        }
-
-        .home-btn:hover {
-            background: #e6ecf3;
-        }
-
-        .logout-btn {
-            background: #ffffff;
-            color: #b91c1c;
-            border-color: #ffcfcf;
-        }
-
-        .logout-btn i {
-            color: #b91c1c;
-        }
-
-        .logout-btn:hover {
-            background: #fee2e2;
-            border-color: #fecaca;
-        }
-
-        .main {
-            flex: 1;
-            padding: 2rem 2rem 1.5rem;
-            max-width: 1600px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* Stats Cards */
-        .metric-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 2rem;
-        }
-
-        .metric-card {
-            background: white;
-            padding: 1.25rem 1.5rem;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0, 20, 40, 0.03);
-            border: 1px solid #edf2f9;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .metric-icon {
-            width: 48px;
-            height: 48px;
-            background: #e9effa;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #1e4f8a;
-            font-size: 1.6rem;
-        }
-
-        .metric-content h3 {
-            font-size: 0.85rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            color: #59748f;
-            margin-bottom: 0.25rem;
-        }
-
-        .metric-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #0a1a32;
-            line-height: 1.2;
-        }
-
-        /* Filters Panel */
-        .filters-panel {
-            background: white;
-            border-radius: 18px;
-            padding: 1rem 1.5rem;
-            border: 1px solid #eef3f9;
-            margin-bottom: 2rem;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #416a8d;
-            background: #ecf3fb;
-            padding: 0.35rem 1rem;
-            border-radius: 30px;
-        }
-
-        .filter-select, .filter-input {
-            background: white;
-            border: 1px solid #d7e2ed;
-            padding: 0.45rem 2rem 0.45rem 1rem;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #1e2f44;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233b5e8b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.8rem center;
-            background-size: 14px;
-            cursor: pointer;
-        }
-
-        .filter-input {
-            background-image: none;
-            padding: 0.45rem 1rem;
-            min-width: 200px;
-        }
-
-        .filter-select:focus, .filter-input:focus {
-            outline: none;
-            border-color: #2f5b9c;
-        }
-
-        .last-updated {
-            margin-left: auto;
-            font-size: 0.8rem;
-            color: #6f8dae;
-            background: #f1f7ff;
-            padding: 0.3rem 1rem;
-            border-radius: 30px;
-            white-space: nowrap;
-        }
-
-        /* Table Card */
-        .table-card {
-            background: white;
-            border-radius: 24px;
-            border: 1px solid #e6eefc;
-            box-shadow: 0 8px 20px -6px rgba(0, 45, 80, 0.05);
-            overflow: hidden;
-            margin-bottom: 2rem;
-        }
-
-        .table-header {
-            padding: 1.2rem 1.8rem;
-            background: #f9fcff;
-            border-bottom: 1px solid #deeaf5;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .table-header h2 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #132b45;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .table-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .view-toggle {
-            display: flex;
-            gap: 0.25rem;
-            background: #eef3fc;
-            padding: 0.25rem;
-            border-radius: 40px;
-        }
-
-        .view-toggle button {
-            padding: 0.5rem 1rem;
-            border: none;
-            background: transparent;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #4a627a;
-            transition: all 0.15s;
-        }
-
-        .view-toggle button.active {
-            background: white;
-            color: #1e3a8a;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .badge-rows {
-            background: #d9e9ff;
-            color: #15477c;
-            padding: 0.25rem 1rem;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            max-height: 600px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #b6cbe0 #ecf3fa;
-        }
-
-        .dashboard-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-            min-width: 1400px;
-        }
-
-        .dashboard-table th {
-            background: #f2f8ff;
-            color: #1f3c68;
-            font-weight: 600;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            padding: 1rem 0.8rem;
-            text-align: left;
-            border-bottom: 1px solid #d2e2f5;
-            position: sticky;
-            top: 0;
-            background: #f2f8ff;
-            z-index: 10;
-        }
-
-        .dashboard-table td {
-            padding: 1rem 0.8rem;
-            border-bottom: 1px solid #eef3fc;
-            color: #1b3149;
-            font-weight: 400;
-        }
-
-        .dashboard-table tbody tr:hover {
-            background-color: #f6fafe;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.2rem 0.9rem;
-            border-radius: 50px;
-            font-weight: 500;
-            font-size: 0.75rem;
-        }
-
-        .status-active { background: #e0f2e6; color: #1b6d4b; }
-        .status-pending { background: #fff3d8; color: #aa5f1e; }
-        .status-resolved { background: #ddeeff; color: #134b8e; }
-        .status-critical { background: #ffe5e5; color: #b12e2e; }
-
-        .image-link {
-            color: #1e4f8a;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .image-link:hover {
-            text-decoration: underline;
-        }
-
-        /* Detail View */
-        .detail-view {
-            background: white;
-            border-radius: 24px;
-            padding: 1.5rem;
-            border: 1px solid #e6eefc;
-            margin-bottom: 2rem;
-        }
-
-        .detail-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .detail-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1rem;
-        }
-
-        .detail-item {
-            padding: 1rem;
-            background: #f8fafd;
-            border-radius: 12px;
-            border: 1px solid #e9f0f8;
-        }
-
-        .detail-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            color: #64748b;
-            margin-bottom: 0.25rem;
-        }
-
-        .detail-value {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #0f182a;
-            word-break: break-word;
-        }
-
-        .map-container {
-            height: 300px;
-            border-radius: 12px;
-            margin-top: 1rem;
-            border: 1px solid #e9f0f8;
-        }
-
-        .hidden { display: none; }
-
-        .loader-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 400px;
-            background: white;
-            border-radius: 30px;
-            border: 1px solid #eef3f9;
-        }
-
-        .spinner {
-            border: 3px solid #e2ecfe;
-            border-top: 3px solid #1f5090;
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .error-message {
-            background: #fee2e2;
-            color: #b91c1c;
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            border: 1px solid #fecaca;
-        }
-
-        .success-message {
-            background: #dcfce7;
-            color: #166534;
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            border: 1px solid #bbf7d0;
-        }
+        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;}
+        body{background:#f0f3f8;color:#1e293b;}
+        .dashboard-header{background:#fff;padding:0.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;}
+        .logo-area{display:flex;align-items:center;gap:0.75rem;}
+        .logo-icon{background:#1e3a8a;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;}
+        .logo-text h1{font-size:1.2rem;font-weight:600;color:#0f172a;}
+        .logo-text span{font-size:0.7rem;background:#eef2f6;padding:0.2rem 0.6rem;border-radius:20px;margin-left:0.5rem;}
+        .header-actions{display:flex;gap:0.75rem;}
+        .home-btn,.logout-btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.4rem 1rem;border-radius:30px;font-size:0.85rem;text-decoration:none;border:1px solid transparent;}
+        .home-btn{background:#f1f5f9;color:#334155;border-color:#d1d9e6;}
+        .logout-btn{background:#fff;color:#b91c1c;border-color:#fecaca;}
+        .main{padding:1rem;max-width:1600px;margin:0 auto;}
+        .loader-wrapper{display:flex;justify-content:center;align-items:center;min-height:300px;background:white;border-radius:20px;}
+        .spinner{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#1e3a8a;border-radius:50%;animation:spin 0.6s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+        .hidden{display:none !important;}
+        /* Compact metrics */
+        .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.75rem;margin-bottom:1rem;}
+        .metric-card{background:white;padding:0.75rem 1rem;border-radius:16px;box-shadow:0 2px 6px rgba(0,0,0,0.02);border:1px solid #edf2f9;display:flex;align-items:center;gap:0.75rem;}
+        .metric-icon{width:40px;height:40px;background:#e9effa;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#1e4f8a;font-size:1.2rem;}
+        .metric-content h3{font-size:0.7rem;font-weight:500;color:#59748f;margin-bottom:0.1rem;}
+        .metric-number{font-size:1.5rem;font-weight:700;color:#0a1a32;line-height:1.2;}
+        /* Filters */
+        .filters-panel{background:white;border-radius:16px;padding:0.75rem 1rem;border:1px solid #eef3f9;margin-bottom:1rem;display:flex;flex-wrap:wrap;align-items:center;gap:1rem;}
+        .filter-group{display:flex;align-items:center;gap:0.5rem;}
+        .filter-label{font-size:0.75rem;font-weight:600;color:#416a8d;background:#ecf3fb;padding:0.2rem 0.8rem;border-radius:30px;}
+        .filter-select{background:white;border:1px solid #d7e2ed;padding:0.3rem 1.5rem 0.3rem 0.8rem;border-radius:30px;font-size:0.8rem;color:#1e2f44;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%233b5e8b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0.5rem center;}
+        .last-updated{margin-left:auto;font-size:0.7rem;color:#6f8dae;background:#f1f7ff;padding:0.2rem 0.8rem;border-radius:30px;white-space:nowrap;}
+        /* Table */
+        .table-card{background:white;border-radius:20px;border:1px solid #e6eefc;overflow:hidden;}
+        .table-header{padding:0.75rem 1rem;background:#f9fcff;border-bottom:1px solid #deeaf5;display:flex;justify-content:space-between;align-items:center;}
+        .table-header h2{font-size:1rem;font-weight:600;color:#132b45;display:flex;align-items:center;gap:0.4rem;}
+        .badge-rows{background:#d9e9ff;color:#15477c;padding:0.2rem 0.8rem;border-radius:30px;font-size:0.7rem;font-weight:600;}
+        .table-wrapper{overflow-x:auto;max-height:400px;overflow-y:auto;}
+        .dashboard-table{width:100%;border-collapse:collapse;font-size:0.75rem;min-width:900px;}
+        .dashboard-table th{background:#f2f8ff;color:#1f3c68;font-weight:600;padding:0.6rem 0.5rem;text-align:left;border-bottom:1px solid #d2e2f5;position:sticky;top:0;z-index:10;}
+        .dashboard-table td{padding:0.6rem 0.5rem;border-bottom:1px solid #eef3fc;}
+        .status-badge{display:inline-block;padding:0.1rem 0.6rem;border-radius:50px;font-size:0.65rem;font-weight:500;}
+        .status-active{background:#e0f2e6;color:#1b6d4b;}
+        .status-pending{background:#fff3d8;color:#aa5f1e;}
+        .status-resolved{background:#ddeeff;color:#134b8e;}
+        .status-critical{background:#ffe5e5;color:#b12e2e;}
+        /* Skeleton loading */
+        .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;}
+        @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
     </style>
+    <!-- Load Font Awesome async -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" media="print" onload="this.media='all'">
 </head>
 <body>
     <header class="dashboard-header">
         <div class="logo-area">
             <div class="logo-icon"><i class="fas fa-truck"></i></div>
             <div class="logo-text">
-                <h1>Onpoint Fleet <span>Incident Management</span></h1>
+                <h1>Onpoint Fleet <span>Incidents</span></h1>
             </div>
         </div>
         <div class="header-actions">
-            <a href="index.html" class="home-btn" id="homeBtn"><i class="fas fa-home"></i> Home</a>
-            <a href="index.html" class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Log out</a>
+            <a href="index.html" class="home-btn"><i class="fas fa-home"></i> Home</a>
+            <a href="index.html" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Log out</a>
         </div>
     </header>
 
-    <div class="main" id="dashboardMain">
-        <div id="loaderContainer" class="loader-wrapper">
-            <div class="spinner"></div>
-            <div style="margin-left: 1rem; color: #4a627a;">Loading incident data...</div>
+    <div class="main">
+        <!-- Show skeleton while loading -->
+        <div id="skeletonLoader">
+            <div class="metric-grid">
+                ${Array(5).fill().map(() => `
+                    <div class="metric-card skeleton" style="height:70px;"></div>
+                `).join('')}
+            </div>
+            <div class="filters-panel skeleton" style="height:50px;"></div>
+            <div class="table-card">
+                <div class="table-header skeleton" style="height:50px;"></div>
+                <div class="table-wrapper">
+                    ${Array(8).fill().map(() => `
+                        <div class="skeleton" style="height:40px; margin:2px;"></div>
+                    `).join('')}
+                </div>
+            </div>
         </div>
 
+        <!-- Real content (hidden initially) -->
         <div id="dashboardContent" class="hidden">
-            <div id="messageContainer"></div>
-
-            <!-- Stats Cards -->
             <div class="metric-grid" id="metricCards"></div>
 
-            <!-- Filters Panel -->
             <div class="filters-panel">
                 <div class="filter-group">
                     <span class="filter-label"><i class="fas fa-filter"></i>Status</span>
                     <select id="statusFilter" class="filter-select">
-                        <option value="all">All Incidents</option>
+                        <option value="all">All</option>
                         <option value="active">Active</option>
                         <option value="pending">Pending</option>
                         <option value="resolved">Resolved</option>
-                        <option value="critical">Critical</option>
                     </select>
                 </div>
                 <div class="filter-group">
                     <span class="filter-label"><i class="fas fa-truck"></i>Vehicle</span>
                     <select id="vehicleFilter" class="filter-select">
-                        <option value="all">All Vehicles</option>
+                        <option value="all">All</option>
                     </select>
                 </div>
-                <div class="filter-group">
-                    <span class="filter-label"><i class="fas fa-search"></i>Search</span>
-                    <input type="text" id="searchInput" class="filter-input" placeholder="Driver, location, description...">
-                </div>
-                <div class="last-updated" id="lastUpdated"><i class="far fa-clock"></i> loading...</div>
+                <div class="last-updated" id="lastUpdated"><i class="far fa-clock"></i></div>
             </div>
 
-            <!-- View Toggle and Table -->
             <div class="table-card">
                 <div class="table-header">
-                    <h2><i class="fas fa-clipboard-list" style="color:#1e4f8a;"></i> Fleet Incidents</h2>
-                    <div class="table-actions">
-                        <div class="view-toggle">
-                            <button id="tableViewBtn" class="active"><i class="fas fa-table"></i> Table</button>
-                            <button id="detailViewBtn"><i class="fas fa-id-card"></i> Details</button>
-                        </div>
-                        <div class="badge-rows" id="rowCounter">0 entries</div>
-                    </div>
+                    <h2><i class="fas fa-list"></i> Fleet Incidents</h2>
+                    <div class="badge-rows" id="rowCounter">0</div>
                 </div>
-                
-                <!-- Table View -->
-                <div id="tableView">
-                    <div class="table-wrapper">
-                        <table class="dashboard-table">
-                            <thead>
-                                <tr>
-                                    <th>Date/Time</th>
-                                    <th>Vehicle</th>
-                                    <th>Unit #</th>
-                                    <th>Driver</th>
-                                    <th>Accident Type</th>
-                                    <th>Location</th>
-                                    <th>Police Report</th>
-                                    <th>Drunken Driving</th>
-                                    <th>At Fault</th>
-                                    <th>Status</th>
-                                    <th>Images</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody"></tbody>
-                        </table>
-                    </div>
+                <div class="table-wrapper">
+                    <table class="dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Vehicle</th>
+                                <th>Unit</th>
+                                <th>Driver</th>
+                                <th>Type</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Police</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
                 </div>
-
-                <!-- Detail View -->
-                <div id="detailView" class="hidden">
-                    <div class="detail-view" id="detailViewContent"></div>
-                </div>
-            </div>
-
-            <div class="footer-note">
-                <i class="fas fa-database"></i> Live from Google Sheets · Onpoint Incident Fleet Report
-                <span id="recordCount" style="margin-left: 1rem; color: #59748f;"></span>
             </div>
         </div>
     </div>
 
-    <!-- Leaflet for maps -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
     <script>
-        (function() {
-            // Replace with your actual Apps Script URL
-            const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNuQ_pOE2Pa37_B2ctMPt_Ri-U7_1n0Bcnh6B2LiE__H2mTMvTHxth82iDLYUtswmn/exec';
+        // Replace with your deployed URL
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgQuo3bfV1PXWMAoRKCyo-Hr3J9OxH2RVn03T7q0J5c6bKJbH7RY0cXvEN2En9I4mh/exec';
+        
+        // Cache in sessionStorage for instant back/forward
+        let fullDataset = [];
+        let filteredData = [];
+        
+        // Check for cached data immediately
+        const cachedData = sessionStorage.getItem('fleetData');
+        if (cachedData) {
+            try {
+                fullDataset = JSON.parse(cachedData);
+                initializeDashboard();
+            } catch(e) {
+                sessionStorage.removeItem('fleetData');
+            }
+        }
+
+        // Hide skeleton, show dashboard
+        function initializeDashboard() {
+            document.getElementById('skeletonLoader').classList.add('hidden');
+            document.getElementById('dashboardContent').classList.remove('hidden');
             
-            // Global variables
-            let fullDataset = [];
-            let filteredData = [];
-            let currentView = 'table'; // 'table' or 'detail'
+            // Populate filters
+            const vehicles = [...new Set(fullDataset.map(r => r.vehicle).filter(Boolean))].sort();
+            const vehicleFilter = document.getElementById('vehicleFilter');
+            vehicleFilter.innerHTML = '<option value="all">All Vehicles</option>' + 
+                vehicles.map(v => `<option value="${v}">${v}</option>`).join('');
             
-            // DOM elements
-            const loader = document.getElementById('loaderContainer');
-            const dashboard = document.getElementById('dashboardContent');
-            const messageContainer = document.getElementById('messageContainer');
-            const metricDiv = document.getElementById('metricCards');
-            const tableBody = document.getElementById('tableBody');
-            const detailViewContent = document.getElementById('detailViewContent');
-            const tableView = document.getElementById('tableView');
-            const detailView = document.getElementById('detailView');
-            const tableViewBtn = document.getElementById('tableViewBtn');
-            const detailViewBtn = document.getElementById('detailViewBtn');
-            const statusFilterEl = document.getElementById('statusFilter');
-            const vehicleFilterEl = document.getElementById('vehicleFilter');
-            const searchInput = document.getElementById('searchInput');
-            const lastUpdatedSpan = document.getElementById('lastUpdated');
-            const rowCounter = document.getElementById('rowCounter');
-            const recordCount = document.getElementById('recordCount');
+            refreshDashboard();
+        }
 
-            // Helper functions
-            function formatDate(dateStr, timeStr) {
-                if (!dateStr) return '—';
-                try {
-                    const date = new Date(dateStr);
-                    if (isNaN(date.getTime())) return dateStr;
-                    return date.toLocaleDateString();
-                } catch {
-                    return dateStr;
-                }
-            }
-
-            function getStatusClass(status) {
-                const statusLower = (status || 'active').toLowerCase();
-                if (statusLower.includes('resolve')) return 'status-resolved';
-                if (statusLower.includes('pending')) return 'status-pending';
-                if (statusLower.includes('critical')) return 'status-critical';
-                return 'status-active';
-            }
-
-            function capitalize(str) {
-                if (!str) return '';
-                return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-            }
+        // Fast render
+        function refreshDashboard() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const vehicleFilter = document.getElementById('vehicleFilter').value;
+            
+            filteredData = fullDataset.filter(row => {
+                if (statusFilter !== 'all' && (row.status || '').toLowerCase() !== statusFilter) return false;
+                if (vehicleFilter !== 'all' && row.vehicle !== vehicleFilter) return false;
+                return true;
+            });
 
             // Update metrics
-            function updateMetrics(data) {
-                const total = data.length;
-                const withPolice = data.filter(d => d.policeReport && d.policeReport !== '').length;
-                const withDrunk = data.filter(d => d.drunkenDriving && d.drunkenDriving.toLowerCase() === 'yes').length;
-                const withImages = data.filter(d => d.imageUrl && d.imageUrl !== '').length;
+            const metrics = {
+                total: filteredData.length,
+                active: filteredData.filter(d => (d.status || '').toLowerCase() === 'active').length,
+                police: filteredData.filter(d => d.policeReport).length,
+                images: filteredData.filter(d => d.imageUrl).length
+            };
+            
+            document.getElementById('metricCards').innerHTML = `
+                <div class="metric-card"><div class="metric-icon"><i class="fas fa-exclamation-triangle"></i></div><div class="metric-content"><h3>Total</h3><div class="metric-number">${metrics.total}</div></div></div>
+                <div class="metric-card"><div class="metric-icon"><i class="fas fa-bolt"></i></div><div class="metric-content"><h3>Active</h3><div class="metric-number">${metrics.active}</div></div></div>
+                <div class="metric-card"><div class="metric-icon"><i class="fas fa-file-police"></i></div><div class="metric-content"><h3>Police</h3><div class="metric-number">${metrics.police}</div></div></div>
+                <div class="metric-card"><div class="metric-icon"><i class="fas fa-camera"></i></div><div class="metric-content"><h3>Images</h3><div class="metric-number">${metrics.images}</div></div></div>
+            `;
+
+            // Render table rows (fast string concat)
+            let html = '';
+            filteredData.slice(0, 100).forEach(row => { // Limit to 100 rows for speed
+                const status = (row.status || 'Active').toLowerCase();
+                const statusClass = status.includes('pending') ? 'status-pending' : 
+                                   status.includes('resolved') ? 'status-resolved' : 'status-active';
                 
-                // Get unique vehicles
-                const uniqueVehicles = new Set(data.map(d => d.vehicle).filter(Boolean)).size;
+                html += `<tr>
+                    <td>${row.date || ''}</td>
+                    <td><strong>${row.vehicle || ''}</strong></td>
+                    <td>${row.unit || ''}</td>
+                    <td>${row.driver || ''}</td>
+                    <td>${row.incident || row['Accident Type'] || ''}</td>
+                    <td>${row.location || ''}</td>
+                    <td><span class="status-badge ${statusClass}">${status}</span></td>
+                    <td>${row.policeReport ? '✓' : ''}</td>
+                </tr>`;
+            });
+            
+            document.getElementById('tableBody').innerHTML = html || '<tr><td colspan="8" style="text-align:center;">No data</td></tr>';
+            document.getElementById('rowCounter').innerText = filteredData.length + ' entries';
+            document.getElementById('lastUpdated').innerHTML = '<i class="far fa-clock"></i> ' + new Date().toLocaleTimeString();
+        }
 
-                metricDiv.innerHTML = `
-                    <div class="metric-card">
-                        <div class="metric-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                        <div class="metric-content"><h3>Total Incidents</h3><div class="metric-number">${total}</div></div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-icon"><i class="fas fa-truck"></i></div>
-                        <div class="metric-content"><h3>Vehicles Involved</h3><div class="metric-number">${uniqueVehicles}</div></div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-icon"><i class="fas fa-file-police"></i></div>
-                        <div class="metric-content"><h3>Police Reports</h3><div class="metric-number">${withPolice}</div></div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-icon"><i class="fas fa-wine-bottle"></i></div>
-                        <div class="metric-content"><h3>Drunken Driving</h3><div class="metric-number">${withDrunk}</div></div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-icon"><i class="fas fa-camera"></i></div>
-                        <div class="metric-content"><h3>With Images</h3><div class="metric-number">${withImages}</div></div>
-                    </div>
-                `;
-            }
+        // Event listeners
+        document.getElementById('statusFilter').addEventListener('change', refreshDashboard);
+        document.getElementById('vehicleFilter').addEventListener('change', refreshDashboard);
 
-            // Render table view
-            function renderTableView(data) {
-                if (!data.length) {
-                    tableBody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:3rem; color:#7a8fa5;"><i class="fas fa-database"></i> No incidents match the filters</td></tr>`;
-                    return;
-                }
-
-                let html = '';
-                data.forEach(row => {
-                    const statusClass = getStatusClass(row.status);
-                    
-                    html += `<tr>
-                        <td>${row.date || ''} ${row.time || ''}</td>
-                        <td><strong>${row.vehicle || '—'}</strong></td>
-                        <td>${row.unit || '—'}</td>
-                        <td>${row.driver || '—'}<br><small style="color:#6f8dae;">${row.driverPhone || ''}</small></td>
-                        <td>${row.incident || row['Accident Type'] || '—'}</td>
-                        <td>${row.location || '—'}</td>
-                        <td>${row.policeReport || '—'}</td>
-                        <td>${row.drunkenDriving || 'No'}</td>
-                        <td>${row.atFault || '—'}</td>
-                        <td><span class="status-badge ${statusClass}">${capitalize(row.status) || 'Active'}</span></td>
-                        <td>
-                            ${row.imageUrl ? `<a href="${row.imageUrl}" target="_blank" class="image-link"><i class="fas fa-image"></i> View</a>` : '—'}
-                        </td>
-                    </tr>`;
+        // Load fresh data in background
+        if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbwgQuo3bfV1PXWMAoRKCyo-Hr3J9OxH2RVn03T7q0J5c6bKJbH7RY0cXvEN2En9I4mh/exec') {
+            fetch(APPS_SCRIPT_URL + '?t=' + Date.now())
+                .then(r => r.json())
+                .then(data => {
+                    if (data.data) {
+                        fullDataset = data.data;
+                        sessionStorage.setItem('fleetData', JSON.stringify(fullDataset));
+                        
+                        if (!document.getElementById('dashboardContent').classList.contains('hidden')) {
+                            // Already showing, just refresh
+                            initializeDashboard();
+                        } else {
+                            // First load
+                            initializeDashboard();
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.log('Using cached data:', err);
+                    if (!fullDataset.length) {
+                        // No cache and fetch failed - show empty
+                        initializeDashboard();
+                    }
                 });
-                tableBody.innerHTML = html;
-            }
+        } else if (fullDataset.length) {
+            // Using cached data
+            initializeDashboard();
+        } else {
+            document.getElementById('skeletonLoader').innerHTML = '<div style="padding:2rem;text-align:center;">Please configure Apps Script URL</div>';
+        }
 
-            // Render detail view
-            function renderDetailView(data) {
-                if (!data.length) {
-                    detailViewContent.innerHTML = `<div style="text-align:center; padding:3rem; color:#7a8fa5;">No incidents to display</div>`;
-                    return;
-                }
-
-                let html = '';
-                data.forEach((row, index) => {
-                    html += `
-                        <div style="margin-bottom: 2rem; ${index > 0 ? 'border-top: 2px solid #e9f0f8; padding-top: 2rem;' : ''}">
-                            <div class="detail-header">
-                                <h3><i class="fas fa-truck" style="color:#1e4f8a;"></i> Incident #${index + 1} - ${row.vehicle || 'Unknown Vehicle'}</h3>
-                                <span class="status-badge ${getStatusClass(row.status)}">${capitalize(row.status) || 'Active'}</span>
-                            </div>
-                            <div class="detail-grid">
-                                <div class="detail-item">
-                                    <div class="detail-label">Date & Time</div>
-                                    <div class="detail-value">${row.date || ''} ${row.time || ''}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Vehicle Registration</div>
-                                    <div class="detail-value">${row.vehicle || '—'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Unit Number</div>
-                                    <div class="detail-value">${row.unit || '—'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Driver</div>
-                                    <div class="detail-value">${row.driver || '—'}<br>${row.driverPhone || ''}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Accident Type</div>
-                                    <div class="detail-value">${row.incident || row['Accident Type'] || '—'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Location</div>
-                                    <div class="detail-value">${row.location || '—'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Description</div>
-                                    <div class="detail-value">${row.description || '—'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Other Parties</div>
-                                    <div class="detail-value">${row.otherParties || '—'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Police Report</div>
-                                    <div class="detail-value">${row.policeReport || '—'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Officer</div>
-                                    <div class="detail-value">${row.officerName || '—'}<br>${row.officerPhone || ''}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Reported to Metro</div>
-                                    <div class="detail-value">${row.reportedToMetro || '—'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Drunken Driving</div>
-                                    <div class="detail-value">${row.drunkenDriving || 'No'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">At Fault</div>
-                                    <div class="detail-value">${row.atFault || '—'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Coordinates</div>
-                                    <div class="detail-value">${row.latitude || ''}, ${row.longitude || ''}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Image</div>
-                                    <div class="detail-value">
-                                        ${row.imageUrl ? 
-                                            `<a href="${row.imageUrl}" target="_blank" class="image-link"><i class="fas fa-image"></i> View Image</a>` : 
-                                            '—'}
-                                    </div>
-                                </div>
-                            </div>
-                            ${row.latitude && row.longitude ? 
-                                `<div id="map-${index}" class="map-container" data-lat="${row.latitude}" data-lng="${row.longitude}"></div>` : 
-                                ''}
-                        </div>
-                    `;
-                });
-                detailViewContent.innerHTML = html;
-
-                // Initialize maps for each incident with coordinates
-                setTimeout(() => {
-                    data.forEach((row, index) => {
-                        if (row.latitude && row.longitude) {
-                            const mapId = `map-${index}`;
-                            const mapElement = document.getElementById(mapId);
-                            if (mapElement) {
-                                const map = L.map(mapId).setView([row.latitude, row.longitude], 13);
-                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                    attribution: '© OpenStreetMap contributors'
-                                }).addTo(map);
-                                L.marker([row.latitude, row.longitude]).addTo(map);
-                            }
+        // Auto refresh every 60 seconds
+        setInterval(() => {
+            if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbwgQuo3bfV1PXWMAoRKCyo-Hr3J9OxH2RVn03T7q0J5c6bKJbH7RY0cXvEN2En9I4mh/exec') {
+                fetch(APPS_SCRIPT_URL + '?t=' + Date.now())
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.data) {
+                            fullDataset = data.data;
+                            sessionStorage.setItem('fleetData', JSON.stringify(fullDataset));
+                            refreshDashboard();
                         }
                     });
-                }, 100);
             }
-
-            // Update dashboard based on filters and view
-            function refreshDashboard() {
-                const statusVal = statusFilterEl.value;
-                const vehicleVal = vehicleFilterEl.value;
-                const searchVal = searchInput.value.toLowerCase();
-
-                filteredData = fullDataset.filter(row => {
-                    // Status filter
-                    if (statusVal !== 'all') {
-                        const rowStatus = (row.status || 'active').toLowerCase();
-                        if (!rowStatus.includes(statusVal.toLowerCase())) return false;
-                    }
-                    
-                    // Vehicle filter
-                    if (vehicleVal !== 'all') {
-                        if (row.vehicle !== vehicleVal) return false;
-                    }
-                    
-                    // Search filter
-                    if (searchVal) {
-                        const searchableFields = [
-                            row.driver, row.location, row.description, 
-                            row.vehicle, row.unit, row.incident
-                        ].filter(Boolean).join(' ').toLowerCase();
-                        if (!searchableFields.includes(searchVal)) return false;
-                    }
-                    
-                    return true;
-                });
-
-                // Update UI based on current view
-                if (currentView === 'table') {
-                    renderTableView(filteredData);
-                } else {
-                    renderDetailView(filteredData);
-                }
-                
-                updateMetrics(filteredData);
-                rowCounter.innerText = filteredData.length + ' entries';
-                if (recordCount) {
-                    recordCount.innerText = `Showing ${filteredData.length} of ${fullDataset.length} incidents`;
-                }
-            }
-
-            // Update vehicle filter dropdown
-            function updateVehicleFilterOptions() {
-                const vehicles = [...new Set(fullDataset.map(r => r.vehicle).filter(Boolean))].sort();
-                let options = '<option value="all">All Vehicles</option>';
-                vehicles.forEach(v => options += `<option value="${v}">${v}</option>`);
-                vehicleFilterEl.innerHTML = options;
-            }
-
-            // Load data from Apps Script
-            function loadSheetData() {
-                loader.classList.remove('hidden');
-                dashboard.classList.add('hidden');
-                messageContainer.innerHTML = '';
-
-                if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
-                    showMessage('Please configure your Apps Script URL', 'error');
-                    return;
-                }
-
-                const url = APPS_SCRIPT_URL + '?t=' + Date.now(); // Cache bust
-                
-                fetch(url, { 
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: { 'Accept': 'application/json' }
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.error) throw new Error(data.error);
-                    
-                    if (data.data && Array.isArray(data.data)) {
-                        fullDataset = data.data;
-                    } else if (Array.isArray(data)) {
-                        fullDataset = data;
-                    } else {
-                        throw new Error('Unexpected data format');
-                    }
-
-                    if (fullDataset.length === 0) {
-                        showMessage('No data found in the sheet', 'warning');
-                    } else {
-                        showMessage(`Loaded ${fullDataset.length} incidents successfully`, 'success');
-                    }
-
-                    // Update timestamp
-                    const now = new Date();
-                    lastUpdatedSpan.innerHTML = `<i class="far fa-clock"></i> Updated ${now.toLocaleTimeString()}`;
-                    
-                    // Initialize dashboard
-                    updateVehicleFilterOptions();
-                    refreshDashboard();
-                    
-                    loader.classList.add('hidden');
-                    dashboard.classList.remove('hidden');
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showMessage('Failed to load data: ' + error.message, 'error');
-                    loader.classList.add('hidden');
-                });
-            }
-
-            function showMessage(text, type) {
-                const className = type === 'error' ? 'error-message' : 
-                                type === 'success' ? 'success-message' : 'error-message';
-                messageContainer.innerHTML = `<div class="${className}">${text}</div>`;
-                setTimeout(() => {
-                    messageContainer.innerHTML = '';
-                }, 5000);
-            }
-
-            // View toggle handlers
-            tableViewBtn.addEventListener('click', () => {
-                currentView = 'table';
-                tableViewBtn.classList.add('active');
-                detailViewBtn.classList.remove('active');
-                tableView.classList.remove('hidden');
-                detailView.classList.add('hidden');
-                renderTableView(filteredData);
-            });
-
-            detailViewBtn.addEventListener('click', () => {
-                currentView = 'detail';
-                detailViewBtn.classList.add('active');
-                tableViewBtn.classList.remove('active');
-                detailView.classList.remove('hidden');
-                tableView.classList.add('hidden');
-                renderDetailView(filteredData);
-            });
-
-            // Event listeners for filters
-            statusFilterEl.addEventListener('change', refreshDashboard);
-            vehicleFilterEl.addEventListener('change', refreshDashboard);
-            searchInput.addEventListener('input', refreshDashboard);
-
-            // Start loading
-            loadSheetData();
-
-            // Auto-refresh every 5 minutes
-            setInterval(loadSheetData, 300000);
-        })();
+        }, 60000);
     </script>
 </body>
 </html>
