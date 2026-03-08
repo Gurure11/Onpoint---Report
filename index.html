@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OnPoint Fleet Dashboard</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#0b2b5c;
+color:white;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+padding:20px;
+background:#061d3b;
+}
+
+.username{
+font-weight:bold;
+}
+
+.logout{
+background:#d32f2f;
+padding:10px 20px;
+border-radius:20px;
+cursor:pointer;
+}
+
+.container{
+padding:30px;
+}
+
+.search-box{
+padding:10px;
+width:300px;
+border-radius:20px;
+border:none;
+margin-bottom:20px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+color:black;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #ddd;
+}
+
+th{
+background:#1e4f8a;
+color:white;
+}
+
+button{
+padding:6px 12px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+.view{
+background:#2196f3;
+color:white;
+}
+
+.pdf{
+background:#0f9d58;
+color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+
+<div>
+<h2>OnPoint Fleet Dashboard</h2>
+</div>
+
+<div>
+
+<span class="username" id="username">User</span>
+
+<button class="logout" onclick="logout()">
+<i class="fa fa-sign-out-alt"></i> Logout
+</button>
+
+</div>
+
+</div>
+
+<div class="container">
+
+<input
+type="text"
+class="search-box"
+id="searchInput"
+placeholder="Search vehicle, driver, location..."
+onkeyup="searchTable()"
+/>
+
+<table id="reportTable">
+
+<thead>
+<tr>
+
+<th>Date</th>
+<th>Time</th>
+<th>Vehicle</th>
+<th>Driver</th>
+<th>Location</th>
+<th>Type</th>
+<th>Actions</th>
+
+</tr>
+</thead>
+
+<tbody id="tableBody">
+
+</tbody>
+
+</table>
+
+</div>
+
+<script src="dashboard.js"></script>
+
+</body>
+</html>
