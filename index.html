@@ -3,189 +3,1000 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Onpoint Fleet Dashboard</title>
+    <title>OnPoint Fleet - Reports Dashboard</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,sans-serif;}
-        body{background:#f4f7fc;padding:20px;}
-        .header{background:#1e3a8a;color:white;padding:15px 20px;border-radius:10px;margin-bottom:20px;display:flex;justify-content:space-between;}
-        .header a{color:white;text-decoration:none;padding:8px 15px;background:#2e4a9e;border-radius:5px;}
-        .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px;}
-        .stat-card{background:white;padding:20px;border-radius:10px;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
-        .filters{background:white;padding:15px;border-radius:10px;margin-bottom:20px;}
-        select{padding:8px;margin-right:10px;border-radius:5px;border:1px solid #ddd;}
-        table{width:100%;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
-        th{background:#1e3a8a;color:white;padding:12px;text-align:left;}
-        td{padding:10px;border-bottom:1px solid #eee;}
-        .loading{text-align:center;padding:50px;font-size:18px;color:#666;}
-        .error{background:#fee2e2;color:#b91c1c;padding:20px;border-radius:10px;margin-bottom:20px;border:1px solid #fecaca;}
-        .debug-info{background:#e6f3ff;padding:15px;border-radius:8px;margin-top:10px;font-family:monospace;font-size:12px;}
-        .hidden{display:none;}
-        .btn{background:#1e3a8a;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;margin-right:10px;}
-        .btn:hover{background:#2e4a9e;}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #f0f4f8;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #0b2b5c;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-brand img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: white;
+            padding: 5px;
+        }
+
+        .nav-brand span {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-brand small {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            display: block;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .user-email {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .nav-btn i {
+            font-size: 1rem;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title h1 {
+            color: #0b2b5c;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-title p {
+            color: #5a6a7e;
+            font-size: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #0b2b5c;
+            color: white;
+            box-shadow: 0 4px 12px rgba(11,43,92,0.2);
+        }
+
+        .btn-primary:hover {
+            background: #1a3f7a;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #0f9d58;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #0b7e45;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: white;
+            color: #0b2b5c;
+            border: 2px solid #0b2b5c;
+        }
+
+        .btn-outline:hover {
+            background: #0b2b5c;
+            color: white;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(11,43,92,0.1);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(11,43,92,0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon i {
+            font-size: 1.8rem;
+            color: #0b2b5c;
+        }
+
+        .stat-label {
+            color: #5a6a7e;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0b2b5c;
+        }
+
+        /* Search Box */
+        .search-box {
+            background: white;
+            border-radius: 50px;
+            padding: 0.5rem 0.5rem 0.5rem 1.5rem;
+            display: flex;
+            align-items: center;
+            border: 1px solid #e0e7ef;
+            max-width: 400px;
+        }
+
+        .search-box i {
+            color: #9aa9b9;
+        }
+
+        .search-box input {
+            border: none;
+            padding: 0.75rem;
+            width: 100%;
+            font-size: 1rem;
+            outline: none;
+            background: transparent;
+        }
+
+        .search-box button {
+            background: #0b2b5c;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .search-box button:hover {
+            background: #1a3f7a;
+        }
+
+        /* Filters */
+        .filters-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            border: 1px solid #e0e7ef;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            color: #5a6a7e;
+            font-weight: 500;
+        }
+
+        .filter-select {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid #e0e7ef;
+            outline: none;
+            background: #f8fafd;
+        }
+
+        /* Reports Table */
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(11,43,92,0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            background: #f8fafd;
+            color: #0b2b5c;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-bottom: 2px solid #e0e7ef;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #eef2f6;
+            color: #2c3e50;
+        }
+
+        tr:hover {
+            background: #f8fafd;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #5a6a7e;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .action-btn:hover {
+            background: #0b2b5c;
+            color: white;
+        }
+
+        .action-btn.pdf-btn:hover {
+            background: #dc3545;
+        }
+
+        .action-btn.view-btn:hover {
+            background: #0f9d58;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eef2f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-header h3 {
+            color: #0b2b5c;
+            font-size: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #5a6a7e;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 0.5rem;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            width: 150px;
+            color: #0b2b5c;
+        }
+
+        .detail-value {
+            flex: 1;
+            color: #2c3e50;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(11,43,92,0.1);
+            border-left-color: #0b2b5c;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #5a6a7e;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #d0d9e6;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            color: #5a6a7e;
+            border-top: 1px solid #e0e7ef;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .nav-user {
+                flex-direction: column;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .filters-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🚚 Onpoint Fleet Incident Dashboard</h1>
-        <div>
-            <a href="index.html">🏠 Home</a>
-            <a href="index.html" style="margin-left:10px;background:#b91c1c;">🚪 Logout</a>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="https://via.placeholder.com/40/0b2b5c/ffffff?text=OP" alt="OnPoint Logo">
+            <div>
+                <span>OnPoint Fleet</span>
+                <small>Reports Dashboard</small>
+            </div>
+        </div>
+        <div class="nav-user">
+            <div class="user-info">
+                <div class="user-name"><?= userName ?></div>
+                <div class="user-email"><?= userEmail ?></div>
+            </div>
+            <a href="index.html" class="nav-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="header-title">
+                <h1>Accident Reports</h1>
+                <p>View, search, and generate PDF reports from submitted incidents</p>
+            </div>
+            <div class="header-actions">
+                <a href="https://script.google.com/macros/s/AKfycbx4SoTlyTCO9wNBybzxPzcI60_lML3G2S-WKtM-1XCDjtedNsFVZZsaDn2_fE4xO-_Z/exec" class="btn btn-primary" target="_blank">
+                    <i class="fas fa-plus-circle"></i> New Report
+                </a>
+                <a href="#" class="btn btn-outline" onclick="window.location.reload()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="statsContainer">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-label">Total Reports</div>
+                <div class="stat-value" id="totalReports">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-label">At Fault</div>
+                <div class="stat-value" id="atFaultCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-label">Not At Fault</div>
+                <div class="stat-value" id="notAtFaultCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-images"></i>
+                </div>
+                <div class="stat-label">With Photos</div>
+                <div class="stat-value" id="withPhotos">0</div>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="filters-bar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by vehicle, driver, location...">
+                <button onclick="filterReports()">Search</button>
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-filter"></i> Accident Type:</label>
+                <select id="typeFilter" class="filter-select" onchange="filterReports()">
+                    <option value="">All Types</option>
+                    <option value="Rear-end">Rear-end</option>
+                    <option value="Side-impact">Side-impact</option>
+                    <option value="Rollover">Rollover</option>
+                    <option value="Single-vehicle">Single-vehicle</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label><i class="fas fa-gavel"></i> At Fault:</label>
+                <select id="faultFilter" class="filter-select" onchange="filterReports()">
+                    <option value="">All</option>
+                    <option value="Yes">At Fault</option>
+                    <option value="No">Not At Fault</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Reports Table -->
+        <div class="table-container">
+            <div id="loadingSpinner" class="spinner"></div>
+            <div id="tableWrapper" style="display: none;">
+                <table id="reportsTable" class="display responsive nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Vehicle</th>
+                            <th>Driver</th>
+                            <th>Location</th>
+                            <th>Type</th>
+                            <th>At Fault</th>
+                            <th>Police Report</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <i class="fas fa-folder-open"></i>
+                <h3>No Reports Found</h3>
+                <p>There are no accident reports to display.</p>
+            </div>
         </div>
     </div>
 
-    <div id="loading" class="loading">Loading data from Google Sheets...</div>
-    
-    <div id="error" class="error hidden">
-        <h3>⚠️ Error Loading Data</h3>
-        <p id="errorMessage"></p>
-        <div id="debugInfo" class="debug-info hidden"></div>
-        <button class="btn" onclick="location.reload()">🔄 Try Again</button>
-        <button class="btn" onclick="checkSheet()">🔍 Check Sheet Name</button>
-    </div>
-    
-    <div id="content" class="hidden">
-        <div class="stats" id="stats"></div>
-        
-        <div class="filters">
-            <select id="statusFilter">
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="pending">Pending</option>
-                <option value="resolved">Resolved</option>
-            </select>
-            <select id="vehicleFilter">
-                <option value="all">All Vehicles</option>
-            </select>
-            <span id="lastUpdate" style="float:right;color:#666;"></span>
-        </div>
-
-        <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Vehicle</th>
-                        <th>Driver</th>
-                        <th>Accident Type</th>
-                        <th>Location</th>
-                        <th>Status</th>
-                        <th>Police Report</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
+    <!-- Detail Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-invoice"></i> Report Details</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Details will be inserted here -->
+            </div>
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer>
+        <p><i class="fas fa-check-circle" style="color: #0f9d58;"></i> OnPoint Fleet Management System · 71 Pretorius Rd, President Park, Midrand</p>
+        <p style="font-size: 0.8rem; margin-top: 0.5rem;">© 2024 OnPoint Logistics. All rights reserved.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
     <script>
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywofRSo-aJWQEoQ47XwoHYnJC2mSe_kcxpl2gEcf4f95xFYNLnWBXcnmgSLeX-BpbP/exec';
-        
-        let allData = [];
+        // Store reports data
+        let allReports = [];
+        let reportsTable;
 
-        function showError(msg, debug = null) {
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('error').classList.remove('hidden');
-            document.getElementById('errorMessage').innerText = msg;
+        // Initialize on page load
+        $(document).ready(function() {
+            loadReports();
             
-            if (debug) {
-                document.getElementById('debugInfo').classList.remove('hidden');
-                document.getElementById('debugInfo').innerText = typeof debug === 'string' ? debug : JSON.stringify(debug, null, 2);
+            // Setup logout
+            $('#logoutBtn').on('click', function(e) {
+                e.preventDefault();
+                google.script.run.withSuccessHandler(function(url) {
+                    window.location.href = url;
+                }).logout();
+            });
+        });
+
+        // Load reports from Google Sheets
+        function loadReports() {
+            showLoading(true);
+            
+            google.script.run.withSuccessHandler(function(reports) {
+                allReports = reports;
+                displayReports(reports);
+                updateStats(reports);
+                showLoading(false);
+                
+                if (reports.length === 0) {
+                    $('#emptyState').show();
+                    $('#tableWrapper').hide();
+                } else {
+                    $('#emptyState').hide();
+                    $('#tableWrapper').show();
+                }
+            }).withFailureHandler(function(error) {
+                console.error('Error loading reports:', error);
+                showLoading(false);
+                $('#emptyState').show();
+                $('#emptyState').html(`
+                    <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
+                    <h3>Error Loading Reports</h3>
+                    <p>${error.message || 'Please try again later.'}</p>
+                `);
+            }).getReports();
+        }
+
+        // Display reports in table
+        function displayReports(reports) {
+            const tbody = $('#tableBody');
+            tbody.empty();
+            
+            reports.forEach(function(report, index) {
+                const row = $('<tr>');
+                
+                // Format date
+                const reportDate = report['Date'] || 'N/A';
+                
+                // Status badge for at fault
+                const atFault = report['At Fault'] || 'N/A';
+                const faultBadge = atFault === 'Yes' ? 
+                    '<span class="badge badge-danger">Yes</span>' : 
+                    atFault === 'No' ? 
+                    '<span class="badge badge-success">No</span>' : 
+                    '<span class="badge badge-warning">Unknown</span>';
+                
+                // Action buttons
+                const actions = `
+                    <div class="action-btns">
+                        <button class="action-btn view-btn" onclick="viewReport(${index})" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn pdf-btn" onclick="generatePDF(${index})" title="Generate PDF">
+                            <i class="fas fa-file-pdf"></i>
+                        </button>
+                    </div>
+                `;
+                
+                row.html(`
+                    <td>${reportDate}</td>
+                    <td><strong>${report['Vehicle Reg'] || 'N/A'}</strong><br><small>Unit: ${report['Unit Number'] || ''}</small></td>
+                    <td>${report['Driver Name'] || 'N/A'}<br><small>${report['Driver Phone'] || ''}</small></td>
+                    <td>${truncateText(report['Location'] || 'N/A', 30)}</td>
+                    <td>${report['Accident Type'] || 'N/A'}</td>
+                    <td>${faultBadge}</td>
+                    <td>${report['Police Report No'] || 'N/A'}</td>
+                    <td>${actions}</td>
+                `);
+                
+                tbody.append(row);
+            });
+            
+            // Initialize DataTable if not already
+            if ($.fn.DataTable.isDataTable('#reportsTable')) {
+                $('#reportsTable').DataTable().destroy();
             }
-        }
-
-        function checkSheet() {
-            window.open('https://docs.google.com/spreadsheets/d/1vhtaNNmY-YsyDiaA2IFodoBYdQsEcL09F7BgMJo4utI/edit', '_blank');
-        }
-
-        async function loadData() {
-            try {
-                const response = await fetch(APPS_SCRIPT_URL + '?t=' + Date.now());
-                const data = await response.json();
-                
-                if (data.error) {
-                    showError(data.error, { 
-                        message: 'The Apps Script returned an error',
-                        scriptResponse: data,
-                        sheetId: '1vhtaNNmY-YsyDiaA2IFodoBYdQsEcL09F7BgMJo4utI',
-                        expectedSheetName: 'Onpoint Incident Fleet Report'
-                    });
-                    return;
+            
+            reportsTable = $('#reportsTable').DataTable({
+                responsive: true,
+                pageLength: 25,
+                order: [[0, 'desc']],
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search reports..."
                 }
-                
-                if (data.sheetName) {
-                    console.log('Connected to sheet:', data.sheetName);
-                }
-                
-                allData = data.data || [];
-                
-                if (allData.length === 0) {
-                    showError('The sheet exists but contains no data', { 
-                        sheetName: data.sheetName || 'Unknown',
-                        rowCount: 0 
-                    });
-                    return;
-                }
-                
-                // Update UI
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('content').classList.remove('hidden');
-                
-                updateFilters();
-                renderData();
-                document.getElementById('lastUpdate').innerHTML = '🕐 Updated: ' + new Date().toLocaleTimeString();
-                
-            } catch (err) {
-                showError('Failed to connect: ' + err.message, { 
-                    error: err.toString(),
-                    url: APPS_SCRIPT_URL
-                });
-            }
-        }
-
-        function updateFilters() {
-            const vehicles = [...new Set(allData.map(d => d['Vehicle Reg'] || d.vehicle).filter(Boolean))].sort();
-            const select = document.getElementById('vehicleFilter');
-            vehicles.forEach(v => {
-                select.innerHTML += `<option value="${v}">${v}</option>`;
             });
         }
 
-        function renderData() {
-            const status = document.getElementById('statusFilter').value;
-            const vehicle = document.getElementById('vehicleFilter').value;
+        // Filter reports based on search and dropdowns
+        function filterReports() {
+            const searchTerm = $('#searchInput').val().toLowerCase();
+            const typeFilter = $('#typeFilter').val();
+            const faultFilter = $('#faultFilter').val();
             
-            const filtered = allData.filter(d => {
-                if (status !== 'all' && (d.Status || '').toLowerCase() !== status) return false;
-                if (vehicle !== 'all' && (d['Vehicle Reg'] || d.vehicle) !== vehicle) return false;
-                return true;
+            const filtered = allReports.filter(function(report) {
+                // Text search
+                const matchesSearch = searchTerm === '' || 
+                    (report['Vehicle Reg'] && report['Vehicle Reg'].toLowerCase().includes(searchTerm)) ||
+                    (report['Driver Name'] && report['Driver Name'].toLowerCase().includes(searchTerm)) ||
+                    (report['Location'] && report['Location'].toLowerCase().includes(searchTerm)) ||
+                    (report['Description'] && report['Description'].toLowerCase().includes(searchTerm));
+                
+                // Type filter
+                const matchesType = typeFilter === '' || report['Accident Type'] === typeFilter;
+                
+                // Fault filter
+                const matchesFault = faultFilter === '' || report['At Fault'] === faultFilter;
+                
+                return matchesSearch && matchesType && matchesFault;
             });
+            
+            displayReports(filtered);
+        }
 
-            document.getElementById('stats').innerHTML = `
-                <div class="stat-card"><h3>Total</h3><h2>${filtered.length}</h2></div>
-                <div class="stat-card"><h3>Active</h3><h2>${filtered.filter(d => (d.Status || '').toLowerCase() === 'active').length}</h2></div>
-                <div class="stat-card"><h3>Police Reports</h3><h2>${filtered.filter(d => d['Police Report #']).length}</h2></div>
-                <div class="stat-card"><h3>With Images</h3><h2>${filtered.filter(d => d['Image Drive URL']).length}</h2></div>
+        // Update statistics
+        function updateStats(reports) {
+            $('#totalReports').text(reports.length);
+            
+            const atFault = reports.filter(r => r['At Fault'] === 'Yes').length;
+            const notAtFault = reports.filter(r => r['At Fault'] === 'No').length;
+            const withPhotos = reports.filter(r => r['Image File Name'] && r['Image File Name'] !== '').length;
+            
+            $('#atFaultCount').text(atFault);
+            $('#notAtFaultCount').text(notAtFault);
+            $('#withPhotos').text(withPhotos);
+        }
+
+        // View report details in modal
+        function viewReport(index) {
+            const report = allReports[index];
+            if (!report) return;
+            
+            const modalBody = $('#modalBody');
+            modalBody.empty();
+            
+            // Create details HTML
+            const details = `
+                <div class="detail-row">
+                    <div class="detail-label">Date & Time:</div>
+                    <div class="detail-value">${report['Date'] || 'N/A'} ${report['Time'] || ''}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Vehicle:</div>
+                    <div class="detail-value">${report['Vehicle Reg'] || 'N/A'} (Unit ${report['Unit Number'] || 'N/A'})</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Driver:</div>
+                    <div class="detail-value">${report['Driver Name'] || 'N/A'} - ${report['Driver Phone'] || 'N/A'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Location:</div>
+                    <div class="detail-value">${report['Location'] || 'N/A'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Accident Type:</div>
+                    <div class="detail-value">${report['Accident Type'] || 'N/A'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Description:</div>
+                    <div class="detail-value">${report['Description'] || 'N/A'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Other Parties:</div>
+                    <div class="detail-value">${report['Other Parties'] || 'None'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Police Report:</div>
+                    <div class="detail-value">${report['Police Report No'] || 'N/A'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Officer:</div>
+                    <div class="detail-value">${report['Officer Name'] || 'N/A'} (${report['Officer Phone'] || ''})</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">At Fault:</div>
+                    <div class="detail-value">${report['At Fault'] || 'N/A'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Drunken Driving:</div>
+                    <div class="detail-value">${report['Drunken Driving'] || 'N/A'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Reported to Metro:</div>
+                    <div class="detail-value">${report['Reported to Metro'] || 'N/A'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Coordinates:</div>
+                    <div class="detail-value">
+                        ${report['Latitude'] && report['Latitude'] !== 'unknown' ? 
+                          `${report['Latitude']}, ${report['Longitude']}` : 'Not available'}
+                        ${report['Geo URL'] ? `<br><a href="${report['Geo URL']}" target="_blank">View on Google Maps</a>` : ''}
+                    </div>
+                </div>
+                ${report['Image File Name'] ? `
+                <div class="detail-row">
+                    <div class="detail-label">Image:</div>
+                    <div class="detail-value">
+                        ${report['Image File Name']}
+                        ${report['Image Drive Link'] ? `<br><a href="${report['Image Drive Link']}" target="_blank">View in Google Drive</a>` : ''}
+                    </div>
+                </div>
+                ` : ''}
             `;
-
-            let html = '';
-            filtered.slice(0, 100).forEach(d => {
-                html += `<tr>
-                    <td>${d.Date || d.date || ''}</td>
-                    <td><b>${d['Vehicle Reg'] || d.vehicle || ''}</b></td>
-                    <td>${d['Driver Name'] || d.driver || ''}</td>
-                    <td>${d['Accident Type'] || d.incident || ''}</td>
-                    <td>${d.Location || d.location || ''}</td>
-                    <td>${d.Status || d.status || 'Active'}</td>
-                    <td>${d['Police Report #'] || ''}</td>
-                </tr>`;
-            });
-            document.getElementById('tableBody').innerHTML = html || '<tr><td colspan="7" style="text-align:center;">No data</td></tr>';
+            
+            modalBody.html(details);
+            $('#detailModal').addClass('active');
         }
 
-        document.getElementById('statusFilter').addEventListener('change', renderData);
-        document.getElementById('vehicleFilter').addEventListener('change', renderData);
+        // Generate PDF for report
+        function generatePDF(index) {
+            const report = allReports[index];
+            if (!report) return;
+            
+            // Show loading
+            const originalText = $(`.pdf-btn:eq(${index})`).html();
+            $(`.pdf-btn:eq(${index})`).html('<i class="fas fa-spinner fa-pulse"></i>');
+            
+            google.script.run.withSuccessHandler(function(result) {
+                $(`.pdf-btn:eq(${index})`).html(originalText);
+                
+                if (result.success) {
+                    // Open PDF in new tab
+                    window.open(result.url, '_blank');
+                    
+                    // Show success message
+                    showNotification('PDF generated successfully!', 'success');
+                } else {
+                    showNotification('Error generating PDF: ' + result.error, 'error');
+                }
+            }).withFailureHandler(function(error) {
+                $(`.pdf-btn:eq(${index})`).html(originalText);
+                showNotification('Error: ' + error.message, 'error');
+            }).generatePDF(report);
+        }
 
-        loadData();
+        // Close modal
+        function closeModal() {
+            $('#detailModal').removeClass('active');
+        }
+
+        // Show/hide loading spinner
+        function showLoading(show) {
+            if (show) {
+                $('#loadingSpinner').show();
+                $('#tableWrapper').hide();
+                $('#emptyState').hide();
+            } else {
+                $('#loadingSpinner').hide();
+            }
+        }
+
+        // Truncate text
+        function truncateText(text, length) {
+            if (text.length <= length) return text;
+            return text.substring(0, length) + '...';
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            // Create notification element if it doesn't exist
+            let notification = $('#notification');
+            if (notification.length === 0) {
+                $('body').append('<div id="notification" style="position:fixed; top:20px; right:20px; z-index:9999; display:none;"></div>');
+                notification = $('#notification');
+            }
+            
+            const bgColor = type === 'success' ? '#0f9d58' : '#dc3545';
+            notification.html(`
+                <div style="background: ${bgColor}; color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}"></i>
+                    ${message}
+                </div>
+            `);
+            
+            notification.fadeIn();
+            setTimeout(function() {
+                notification.fadeOut();
+            }, 3000);
+        }
+
+        // Close modal when clicking outside
+        $(window).on('click', function(e) {
+            if ($(e.target).hasClass('modal')) {
+                closeModal();
+            }
+        });
+
+        // Handle escape key
+        $(document).on('keyup', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
     </script>
 </body>
 </html>
