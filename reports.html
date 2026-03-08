@@ -530,6 +530,42 @@
                 max-width: 100%;
             }
         }
+
+        /* Debug Panel */
+        .debug-panel {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .debug-panel.visible {
+            display: block;
+        }
+
+        .debug-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .debug-title {
+            font-weight: 600;
+            color: #6c757d;
+        }
+
+        .debug-content {
+            font-family: monospace;
+            font-size: 0.9rem;
+            background: #e9ecef;
+            padding: 0.5rem;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -547,14 +583,25 @@
                 <div class="user-name"><?= userName ?></div>
                 <div class="user-email"><?= userEmail ?></div>
             </div>
-            <a href="index.html" class="nav-btn" id="logoutBtn">
+            <button class="nav-btn" id="logoutBtn">
                 <i class="fas fa-sign-out-alt"></i> Logout
-            </a>
+            </button>
         </div>
     </nav>
 
     <!-- Main Container -->
     <div class="container">
+        <!-- Debug Panel (hidden by default) -->
+        <div class="debug-panel" id="debugPanel">
+            <div class="debug-header">
+                <span class="debug-title"><i class="fas fa-bug"></i> Debug Information</span>
+                <button class="nav-btn" onclick="toggleDebug()" style="padding: 4px 8px;">Hide</button>
+            </div>
+            <div class="debug-content" id="debugContent">
+                Loading...
+            </div>
+        </div>
+
         <!-- Dashboard Header -->
         <div class="dashboard-header">
             <div class="header-title">
@@ -562,12 +609,15 @@
                 <p>View, search, and generate PDF reports from submitted incidents</p>
             </div>
             <div class="header-actions">
-                <a href="https://script.google.com/macros/s/AKfycbyy7h0im2Xxz8LypQFjS5ZLUiXcz1vi6xvwXIEdo16QlNsFFYD79o4-rgYxZBEoiRzG/exec" class="btn btn-primary" target="_blank">
+                <button class="btn btn-primary" onclick="window.open('?page=form', '_blank')">
                     <i class="fas fa-plus-circle"></i> New Report
-                </a>
-                <a href="#" class="btn btn-outline" onclick="window.location.reload()">
+                </button>
+                <button class="btn btn-outline" onclick="refreshData()">
                     <i class="fas fa-sync-alt"></i> Refresh
-                </a>
+                </button>
+                <button class="btn btn-outline" onclick="toggleDebug()">
+                    <i class="fas fa-bug"></i> Debug
+                </button>
             </div>
         </div>
 
@@ -688,9 +738,11 @@
         // Store reports data
         let allReports = [];
         let reportsTable;
+        let debugMode = false;
 
         // Initialize on page load
         $(document).ready(function() {
+            console.log('Reports page loaded');
             loadReports();
             
             // Setup logout
@@ -704,35 +756,50 @@
 
         // Load reports from Google Sheets
         function loadReports() {
+            console.log('Loading reports...');
             showLoading(true);
+            updateDebug('Loading reports from Google Sheets...');
             
             google.script.run.withSuccessHandler(function(reports) {
-                allReports = reports;
-                displayReports(reports);
-                updateStats(reports);
-                showLoading(false);
+                console.log('Reports loaded:', reports);
+                updateDebug('Reports loaded successfully. Count: ' + (reports ? reports.length : 0));
                 
-                if (reports.length === 0) {
-                    $('#emptyState').show();
-                    $('#tableWrapper').hide();
-                } else {
+                if (reports && reports.length > 0) {
+                    console.log('First report:', reports[0]);
+                    allReports = reports;
+                    displayReports(reports);
+                    updateStats(reports);
                     $('#emptyState').hide();
                     $('#tableWrapper').show();
+                } else {
+                    console.log('No reports found');
+                    allReports = [];
+                    $('#emptyState').show();
+                    $('#tableWrapper').hide();
+                    $('#statsContainer .stat-value').text('0');
                 }
+                
+                showLoading(false);
+                
             }).withFailureHandler(function(error) {
                 console.error('Error loading reports:', error);
+                updateDebug('Error: ' + JSON.stringify(error));
                 showLoading(false);
                 $('#emptyState').show();
                 $('#emptyState').html(`
                     <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
                     <h3>Error Loading Reports</h3>
-                    <p>${error.message || 'Please try again later.'}</p>
+                    <p>${error.message || 'Please check console for details.'}</p>
+                    <button class="btn btn-primary" onclick="loadReports()" style="margin-top: 1rem;">
+                        <i class="fas fa-sync-alt"></i> Retry
+                    </button>
                 `);
             }).getReports();
         }
 
         // Display reports in table
         function displayReports(reports) {
+            console.log('Displaying reports:', reports.length);
             const tbody = $('#tableBody');
             tbody.empty();
             
@@ -744,11 +811,12 @@
                 
                 // Status badge for at fault
                 const atFault = report['At Fault'] || 'N/A';
-                const faultBadge = atFault === 'Yes' ? 
-                    '<span class="badge badge-danger">Yes</span>' : 
-                    atFault === 'No' ? 
-                    '<span class="badge badge-success">No</span>' : 
-                    '<span class="badge badge-warning">Unknown</span>';
+                let faultBadge = '<span class="badge badge-warning">Unknown</span>';
+                if (atFault === 'Yes') {
+                    faultBadge = '<span class="badge badge-danger">Yes</span>';
+                } else if (atFault === 'No') {
+                    faultBadge = '<span class="badge badge-success">No</span>';
+                }
                 
                 // Action buttons
                 const actions = `
@@ -794,6 +862,7 @@
 
         // Filter reports based on search and dropdowns
         function filterReports() {
+            console.log('Filtering reports...');
             const searchTerm = $('#searchInput').val().toLowerCase();
             const typeFilter = $('#typeFilter').val();
             const faultFilter = $('#faultFilter').val();
@@ -892,9 +961,9 @@
                 <div class="detail-row">
                     <div class="detail-label">Coordinates:</div>
                     <div class="detail-value">
-                        ${report['Latitude'] && report['Latitude'] !== 'unknown' ? 
+                        ${report['Latitude'] && report['Latitude'] !== 'unknown' && report['Latitude'] !== '' ? 
                           `${report['Latitude']}, ${report['Longitude']}` : 'Not available'}
-                        ${report['Geo URL'] ? `<br><a href="${report['Geo URL']}" target="_blank">View on Google Maps</a>` : ''}
+                        ${report['Geo URL'] && report['Geo URL'] !== '' ? `<br><a href="${report['Geo URL']}" target="_blank">View on Google Maps</a>` : ''}
                     </div>
                 </div>
                 ${report['Image File Name'] ? `
@@ -920,9 +989,11 @@
             // Show loading
             const originalText = $(`.pdf-btn:eq(${index})`).html();
             $(`.pdf-btn:eq(${index})`).html('<i class="fas fa-spinner fa-pulse"></i>');
+            updateDebug('Generating PDF for report: ' + (report['Vehicle Reg'] || 'Unknown'));
             
             google.script.run.withSuccessHandler(function(result) {
                 $(`.pdf-btn:eq(${index})`).html(originalText);
+                updateDebug('PDF generation result: ' + JSON.stringify(result));
                 
                 if (result.success) {
                     // Open PDF in new tab
@@ -935,8 +1006,15 @@
                 }
             }).withFailureHandler(function(error) {
                 $(`.pdf-btn:eq(${index})`).html(originalText);
+                updateDebug('PDF generation error: ' + JSON.stringify(error));
                 showNotification('Error: ' + error.message, 'error');
             }).generatePDF(report);
+        }
+
+        // Refresh data
+        function refreshData() {
+            console.log('Refreshing data...');
+            loadReports();
         }
 
         // Close modal
@@ -957,6 +1035,7 @@
 
         // Truncate text
         function truncateText(text, length) {
+            if (!text) return 'N/A';
             if (text.length <= length) return text;
             return text.substring(0, length) + '...';
         }
@@ -982,6 +1061,29 @@
             setTimeout(function() {
                 notification.fadeOut();
             }, 3000);
+        }
+
+        // Toggle debug panel
+        function toggleDebug() {
+            debugMode = !debugMode;
+            if (debugMode) {
+                $('#debugPanel').addClass('visible');
+            } else {
+                $('#debugPanel').removeClass('visible');
+            }
+        }
+
+        // Update debug content
+        function updateDebug(message) {
+            const debugContent = $('#debugContent');
+            const timestamp = new Date().toLocaleTimeString();
+            debugContent.prepend('<div>[' + timestamp + '] ' + message + '</div>');
+            
+            // Keep only last 20 messages
+            const lines = debugContent.children();
+            if (lines.length > 20) {
+                lines.last().remove();
+            }
         }
 
         // Close modal when clicking outside
