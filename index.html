@@ -42,7 +42,7 @@
             <div class="col-md-3"><div class="stat-card p-3 bg-white rounded-4"><span class="text-secondary">Total Swipes</span><h3 id="totalSwipes">0</h3></div></div>
             <div class="col-md-3"><div class="stat-card p-3 bg-white rounded-4"><span class="text-secondary">Approved</span><h3 id="totalApproved">0</h3></div></div>
             <div class="col-md-3"><div class="stat-card p-3 bg-white rounded-4"><span class="text-secondary">Not Approved</span><h3 id="totalNoEr">0</h3></div></div>
-            <div class="col-md-3"><div class="stat-card p-3 bg-white rounded-4"><span class="text-secondary">Total Variance</span><h3 id="totalVariance">$0</h3></div></div>
+            <div class="col-md-3"><div class="stat-card p-3 bg-white rounded-4"><span class="text-secondary">Total Variance</span><h3 id="totalVariance">R0</h3></div></div>
         </div>
 
         <!-- Input Form -->
@@ -68,8 +68,8 @@
                     </select>
                 </div>
                 <div class="col-md-2"><input type="text" id="erNo" class="form-control rounded-pill" placeholder="ER No. or 0"></div>
-                <div class="col-md-2"><input type="number" id="erAmount" class="form-control rounded-pill" placeholder="ER $"></div>
-                <div class="col-md-2"><input type="number" id="swipeAmount" class="form-control rounded-pill" placeholder="Swipe $"></div>
+                <div class="col-md-2"><input type="number" id="erAmount" class="form-control rounded-pill" placeholder="ER R"></div>
+                <div class="col-md-2"><input type="number" id="swipeAmount" class="form-control rounded-pill" placeholder="Swipe R"></div>
                 <div class="col-12 text-end">
                     <button class="btn btn-onpoint px-5" id="addSwipeBtn"><i class="fas fa-save me-2"></i>Save Record</button>
                 </div>
@@ -248,7 +248,7 @@
                 document.getElementById('totalNoEr').innerText = fuelRecords.filter(r => !r.erNo || r.erNo === '0').length;
                 
                 const totalVar = fuelRecords.reduce((acc, r) => acc + (r.swipeAmount - (r.erAmount || 0)), 0);
-                document.getElementById('totalVariance').innerText = '$' + totalVar.toFixed(2);
+                document.getElementById('totalVariance').innerText = 'R' + totalVar.toFixed(2);
 
                 // All records table
                 let allHtml = '';
@@ -257,8 +257,8 @@
                     const status = (r.erNo && r.erNo !== '0') ? '<span class="badge-approved">approved</span>' : '<span class="badge-missing">not approved</span>';
                     allHtml += `<tr>
                         <td>${r.date}</td><td>${r.driver}</td><td>${r.erNo || '0'}</td>
-                        <td>$${(r.erAmount || 0).toFixed(2)}</td><td>$${r.swipeAmount.toFixed(2)}</td>
-                        <td class="${parseFloat(variance) < 0 ? 'text-danger' : 'text-success'}">$${variance}</td>
+                        <td>R${(r.erAmount || 0).toFixed(2)}</td><td>R${r.swipeAmount.toFixed(2)}</td>
+                        <td class="${parseFloat(variance) < 0 ? 'text-danger' : 'text-success'}">R${variance}</td>
                         <td>${status}</td>
                     </tr>`;
                 });
@@ -271,14 +271,14 @@
                     if (!r.erNo || r.erNo === '0') {
                         discHtml += `<tr class="table-warning">
                             <td>${r.date}</td><td>${r.driver}</td><td>0</td>
-                            <td>$0</td><td>$${r.swipeAmount.toFixed(2)}</td>
+                            <td>R0</td><td>R${r.swipeAmount.toFixed(2)}</td>
                             <td><span class="badge-missing">No ER</span></td>
                         </tr>`;
                     } else if (Math.abs(variance) > 0.5) {
                         discHtml += `<tr class="table-danger">
                             <td>${r.date}</td><td>${r.driver}</td><td>${r.erNo}</td>
-                            <td>$${(r.erAmount || 0).toFixed(2)}</td><td>$${r.swipeAmount.toFixed(2)}</td>
-                            <td><span class="badge-mismatch">Variance $${variance.toFixed(2)}</span></td>
+                            <td>R${(r.erAmount || 0).toFixed(2)}</td><td>R${r.swipeAmount.toFixed(2)}</td>
+                            <td><span class="badge-mismatch">Variance R${variance.toFixed(2)}</span></td>
                         </tr>`;
                     }
                 });
