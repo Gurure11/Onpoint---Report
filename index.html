@@ -3,1063 +3,444 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Onpoint Cleaning - Complete Task Timer System</title>
+    <title>Onpoint Group · Fuel Recon Pro+</title>
+    <!-- Bootstrap 5 + icons + chart.js + animate -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { transition: all 0.2s ease; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(145deg, #f0f5fa 0%, #e9eef4 100%);
+            font-family: 'Inter', 'Segoe UI', system-ui;
             min-height: 100vh;
-            padding: 20px;
         }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
+        .glass-card {
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 20px 40px -10px rgba(10,40,70,0.15);
         }
-
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        .welcome-badge {
+            background: linear-gradient(120deg, #0b2b4a, #1e4b6e);
             color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
+            border-radius: 60px;
+            padding: 0.7rem 2rem;
+            box-shadow: 0 10px 20px rgba(0,32,64,0.2);
+            animation: float 3s infinite;
         }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
+            100% { transform: translateY(0px); }
         }
-
-        /* New Field Cleaners Button - Positioned in Header */
-        .field-btn-container {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-        }
-
-        .btn-field {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: #4CAF50;
+        .btn-onpoint {
+            background: #0b2b4a;
             color: white;
-            padding: 12px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1em;
-            border: 2px solid rgba(255,255,255,0.3);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border-radius: 40px;
+            padding: 0.6rem 2rem;
+            border: none;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(11,43,74,0.3);
         }
-
-        .btn-field i {
-            font-size: 1.2em;
-        }
-
-        .btn-field:hover {
-            background: #45a049;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            border-color: rgba(255,255,255,0.5);
-        }
-
-        .btn-field:active {
-            transform: translateY(-1px);
-        }
-
-        /* Responsive button positioning */
-        @media (max-width: 768px) {
-            .header {
-                padding-top: 80px;
-            }
-            
-            .field-btn-container {
-                top: 15px;
-                right: 20px;
-                left: 20px;
-                text-align: center;
-            }
-            
-            .btn-field {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-        }
-
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e9ecef;
-        }
-
+        .btn-onpoint:hover { background: #1f4a6e; transform: scale(1.02); }
         .stat-card {
             background: white;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 1.8rem;
+            padding: 1.2rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.03);
         }
-
-        .stat-card .label {
-            font-size: 12px;
-            color: #666;
-            text-transform: uppercase;
-        }
-
-        .stat-card .value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1e3c72;
-            margin-top: 5px;
-        }
-
-        .staff-info {
-            background: #f8f9fa;
-            padding: 25px;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #495057;
-            font-weight: 600;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #1e3c72;
-        }
-
-        .departments-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-            padding: 25px;
-        }
-
-        .department-card {
-            background: white;
-            border: 2px solid #e9ecef;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .department-header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .department-header h3 {
-            font-size: 1.2em;
-            margin-bottom: 5px;
-        }
-
-        .department-header .staff-assign {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        .tasks-list {
-            padding: 20px;
-        }
-
-        .task-item {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 4px solid #1e3c72;
-        }
-
-        .task-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .task-name {
-            font-weight: 600;
-            color: #1e3c72;
-            font-size: 1.1em;
-        }
-
-        .timer-display {
-            font-family: monospace;
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #2a5298;
-            background: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            border: 1px solid #dee2e6;
-        }
-
-        .time-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .btn-start {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            flex: 1;
-        }
-
-        .btn-stop {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            flex: 1;
-        }
-
-        .btn-start:disabled, .btn-stop:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .time-records {
-            font-size: 0.9em;
-            color: #6c757d;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #dee2e6;
-        }
-
-        .time-record {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-
-        .department-submit {
-            padding: 20px;
-            background: #f8f9fa;
-            border-top: 2px solid #e9ecef;
-            text-align: center;
-        }
-
-        .btn-submit-department {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 1.1em;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.3s;
-            font-weight: 600;
-        }
-
-        .btn-submit-department:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(30, 60, 114, 0.3);
-        }
-
-        .global-controls {
-            padding: 20px;
-            background: #e9ecef;
-            text-align: center;
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn-global {
-            background: #1e3c72;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 1em;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.3s;
-            font-weight: 600;
-        }
-
-        .btn-global:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(30, 60, 114, 0.3);
-        }
-
-        .status-message {
-            margin: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .status-message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            display: block;
-        }
-
-        .status-message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            display: block;
-        }
-
-        .global-timestamp {
-            text-align: right;
-            padding: 10px 25px;
-            background: #f8f9fa;
-            color: #6c757d;
-            font-size: 0.9em;
-            border-top: 1px solid #e9ecef;
-        }
-
-        @media (max-width: 768px) {
-            .departments-grid {
-                grid-template-columns: 1fr;
-            }
-            .stats-bar {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
+        .badge-missing { background: #fef1d6; color: #a66907; padding: 0.4rem 1rem; border-radius: 30px; }
+        .badge-approved { background: #dff0d8; color: #2e6b2e; padding: 0.4rem 1rem; border-radius: 30px; }
+        .badge-variance { background: #e0e7ff; color: #1e3a8a; padding: 0.4rem 1rem; border-radius: 30px; }
+        .badge-mismatch { background: #fadddd; color: #a33a3a; }
+        .filter-chip { background: white; border-radius: 40px; padding: 0.5rem 1.2rem; cursor: pointer; border: 1px solid #dee2e6; }
+        .filter-chip.active { background: #0b2b4a; color: white; border-color: #0b2b4a; }
+        .chart-container { height: 230px; margin-top: 0.5rem; }
+        footer { color: #4e6379; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🧹 Onpoint Task Management System</h1>
-            <p>Real-time Task Tracking & Complete Data Collection</p>
-            
-            <!-- New Field Cleaners Button - Positioned at top right -->
-            <div class="field-btn-container">
-                <a href="field.html" class="btn-field">
-                    <i class="fas fa-leaf"></i> Field Cleaners
-                    <i class="fas fa-arrow-right"></i>
-                </a>
+    <div class="container py-4">
+
+        <!-- logged in user & animation header -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+            <div class="d-flex align-items-center gap-3 animate__animated animate__fadeInLeft">
+                <i class="fas fa-gas-pump fa-3x" style="color:#0b2b4a;"></i>
+                <div>
+                    <h2 class="fw-bold" style="color:#0b2b4a;">Onpoint Group · Fuel Recon Pro+</h2>
+                    <span class="text-secondary"><i class="far fa-clock me-1"></i> variance & approval tracking</span>
+                </div>
+            </div>
+            <div class="welcome-badge animate__animated animate__fadeInRight">
+                <i class="fas fa-user-circle me-2 fa-lg"></i> Welcome, <strong>Thabo M.</strong> (Fleet Supervisor)
             </div>
         </div>
 
-        <!-- Statistics Bar -->
-        <div class="stats-bar">
-            <div class="stat-card">
-                <div class="label">Total Tasks</div>
-                <div class="value" id="totalTasks">40</div>
+        <!-- KPI row with real-time totals -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card d-flex align-items-center justify-content-between animate__animated animate__fadeInUp">
+                    <div><i class="fas fa-credit-card fa-2x text-primary opacity-50"></i></div>
+                    <div class="text-end">
+                        <span class="text-secondary">total swipes</span>
+                        <h3 class="fw-bold" id="totalSwipes">0</h3>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="label">Completed</div>
-                <div class="value" id="completedTasks">0</div>
+            <div class="col-md-3">
+                <div class="stat-card d-flex align-items-center justify-content-between animate__animated animate__fadeInUp" style="animation-delay:0.1s">
+                    <div><i class="fas fa-check-circle fa-2x text-success opacity-50"></i></div>
+                    <div class="text-end">
+                        <span class="text-secondary">approved (ER>0)</span>
+                        <h3 class="fw-bold" id="totalApproved">0</h3>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="label">In Progress</div>
-                <div class="value" id="inProgressTasks">0</div>
+            <div class="col-md-3">
+                <div class="stat-card d-flex align-items-center justify-content-between animate__animated animate__fadeInUp" style="animation-delay:0.2s">
+                    <div><i class="fas fa-exclamation-triangle fa-2x text-warning opacity-50"></i></div>
+                    <div class="text-end">
+                        <span class="text-secondary">not approved (ER=0)</span>
+                        <h3 class="fw-bold" id="totalNoEr">0</h3>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="label">Staff On Duty</div>
-                <div class="value" id="staffOnDuty">0</div>
+            <div class="col-md-3">
+                <div class="stat-card d-flex align-items-center justify-content-between animate__animated animate__fadeInUp" style="animation-delay:0.3s">
+                    <div><i class="fas fa-chart-line fa-2x" style="color:#8a6d3b;"></i></div>
+                    <div class="text-end">
+                        <span class="text-secondary">total variance ($)</span>
+                        <h4 class="fw-bold" id="totalVariance">$0</h4>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Staff Information Section - ALL data collected here -->
-        <div class="staff-info">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>👤 Staff Name *</label>
-                    <select id="staffName" required>
-                        <option value="">Select staff member...</option>
-                        <option value="Francisca Tsotetsi">Francisca Tsotetsi</option>
-                        <option value="Selly Nxele">Selly Nxele</option>
-                        <option value="Lerato M. Mashini">Lerato M. Mashini</option>
+        <!-- INPUT PANEL with ER Amount field (NEW) -->
+        <div class="glass-card p-4 mb-4 animate__animated animate__fadeInUp">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-2">
+                    <label class="fw-semibold mb-1">Date</label>
+                    <input type="date" id="swipeDate" class="form-control rounded-pill" value="2025-03-25">
+                </div>
+                <div class="col-md-2">
+                    <label class="fw-semibold mb-1">Cost Center</label>
+                    <select id="costCenter" class="form-select rounded-pill">
+                        <option>Onpoint Group HQ</option><option>DI Solutions</option><option>Aqua Telecoms</option>
+                        <option>Nkanyezi Projects</option><option>Onpoint Ontime Solutions</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>📋 Employee ID *</label>
-                    <select id="employeeId" required>
-                        <option value="">Select employee ID...</option>
-                        <option value="SUB007">SUB007</option>
-                        <option value="CAS021">CAS021</option>
-                        <option value="DIS026">DIS026</option>
+                <div class="col-md-2">
+                    <label class="fw-semibold mb-1">Department</label>
+                    <select id="department" class="form-select rounded-pill">
+                        <option>Admin</option><option>Business Development</option><option>Finance & IT</option><option>Fleet</option>
+                        <option>HR</option><option>Operations</option><option>Procurements</option><option>Sales</option>
+                        <option>SHEQ</option><option>Tendering</option><option>Warehouse</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>📅 Work Date</label>
-                    <input type="date" id="workDate">
-                </div>
-                <div class="form-group">
-                    <label>⏰ Shift Start</label>
-                    <input type="time" id="shiftStart">
-                </div>
-                <div class="form-group">
-                    <label>⏰ Shift End</label>
-                    <input type="time" id="shiftEnd">
-                </div>
-                <div class="form-group">
-                    <label>📍 Work Location</label>
-                    <select id="workLocation">
-                        <option value="">Select location...</option>
-                        <option value="Onpoint Group Head Office">Onpoint Group Head Office</option>
-                        <option value="DI Solutions">DI Solutions</option>
-                        <option value="Aqua Telecoms">Aqua Telecoms</option>
-                        <option value="NKanyezi Projects">NKanyezi Projects</option>
-                        <option value="Onpoint Ontime Solutions">Onpoint Ontime Solutions</option>
+                <div class="col-md-2">
+                    <label class="fw-semibold mb-1">Driver</label>
+                    <select id="driverName" class="form-select rounded-pill">
+                        <option>Moses</option><option>Paul</option><option>Nkanyeko</option><option>Thebo</option>
+                        <option>Tebello</option><option>Michael</option><option>Devon</option><option>Joseph</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>👔 Supervisor</label>
-                    <input type="text" id="supervisor" placeholder="Supervisor name">
+                <div class="col-md-2">
+                    <label class="fw-semibold mb-1">ER No. (0 if none)</label>
+                    <input type="text" id="erNo" class="form-control rounded-pill" placeholder="e.g. ER-123 or 0">
                 </div>
-                <div class="form-group">
-                    <label>📝 Notes</label>
-                    <input type="text" id="globalNotes" placeholder="General notes">
+                <div class="col-md-2">
+                    <label class="fw-semibold mb-1">ER request $</label>
+                    <input type="number" step="0.01" id="erAmount" class="form-control rounded-pill" placeholder="0.00">
+                </div>
+                <div class="col-md-2">
+                    <label class="fw-semibold mb-1">Bank swipe $</label>
+                    <input type="number" step="0.01" id="swipeAmount" class="form-control rounded-pill" placeholder="0.00">
+                </div>
+                <div class="col-12 d-flex justify-content-end mt-3">
+                    <button class="btn btn-onpoint px-5" id="addSwipeBtn"><i class="fas fa-cloud-upload-alt me-2"></i>Store record</button>
                 </div>
             </div>
         </div>
 
-        <!-- Departments Container -->
-        <div class="departments-grid" id="departmentsContainer"></div>
-
-        <!-- Global Control Buttons -->
-        <div class="global-controls">
-            <button class="btn-global" onclick="submitAllDepartments()">📤 SUBMIT ALL DEPARTMENTS</button>
-            <button class="btn-global" onclick="exportAllData()">📊 EXPORT ALL DATA</button>
-            <button class="btn-global" onclick="resetAllTimers()">🔄 RESET ALL</button>
+        <!-- FILTER CHIPS: approved / not approved / all + search -->
+        <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between my-4">
+            <div class="d-flex gap-2">
+                <span class="filter-chip active" id="filterAll">📊 All records</span>
+                <span class="filter-chip" id="filterApproved">✅ Approved (ER>0)</span>
+                <span class="filter-chip" id="filterNotApproved">⛔ Not approved (ER=0)</span>
+            </div>
+            <div class="input-group w-25">
+                <span class="input-group-text bg-white rounded-start-4"><i class="fas fa-search"></i></span>
+                <input type="text" id="searchInput" class="form-control rounded-end-4" placeholder="Search driver, ER...">
+                <button class="btn btn-outline-secondary" id="clearSearch"><i class="fas fa-times"></i></button>
+            </div>
         </div>
 
-        <!-- Status Message -->
-        <div id="globalStatus" class="status-message"></div>
+        <!-- main row: chart + variance summary + table -->
+        <div class="row g-4">
+            <!-- left column: chart & totals by filter -->
+            <div class="col-lg-5">
+                <div class="glass-card p-3 h-100">
+                    <h5><i class="fas fa-chart-pie me-2"></i>Requested vs swiped (by filter)</h5>
+                    <canvas id="reconChart" style="width:100%; max-height:210px;"></canvas>
+                    <hr class="my-2">
+                    <div class="d-flex justify-content-between small text-secondary">
+                        <span><span class="badge-approved px-2 py-1">✔ approved (ER>0)</span></span>
+                        <span><span class="badge-missing px-2 py-1">⚠ not approved (ER=0)</span></span>
+                    </div>
+                    <!-- dynamic filter-based totals & variance -->
+                    <div class="mt-3" id="filterTotals">
+                        <div class="d-flex justify-content-between"><span>Total requested:</span> <span class="fw-bold" id="totalRequested">$0</span></div>
+                        <div class="d-flex justify-content-between"><span>Total swiped:</span> <span class="fw-bold" id="totalSwipedFilter">$0</span></div>
+                        <div class="d-flex justify-content-between text-danger"><span>Variance (swipe - request):</span> <span class="fw-bold" id="varianceAmount">$0</span></div>
+                        <div class="progress mt-2" style="height:8px;"><div class="progress-bar bg-success" id="varianceBar" style="width:0%"></div></div>
+                    </div>
+                </div>
+            </div>
+            <!-- right column: table with variance column -->
+            <div class="col-lg-7">
+                <div class="glass-card p-3">
+                    <ul class="nav nav-tabs" id="reconTabs" role="tablist">
+                        <li class="nav-item"><button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#allRecords">📋 Detailed view</button></li>
+                        <li class="nav-item"><button class="nav-link" id="discrepancy-tab" data-bs-toggle="tab" data-bs-target="#discrepancyRecords">⚠️ Exceptions (no ER / variance)</button></li>
+                    </ul>
+                    <div class="tab-content mt-3">
+                        <div class="tab-pane fade show active" id="allRecords">
+                            <div style="max-height:350px; overflow:auto" class="border rounded-4">
+                                <table class="table table-sm table-hover mb-0">
+                                    <thead class="sticky-top bg-light">
+                                        <tr><th>Date</th><th>Driver</th><th>ER No.</th><th>Request $</th><th>Swiped $</th><th>Variance $</th><th>Status</th></tr>
+                                    </thead>
+                                    <tbody id="allRecordsBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="discrepancyRecords">
+                            <div style="max-height:350px; overflow:auto" class="border rounded-4">
+                                <table class="table table-sm table-hover mb-0">
+                                    <thead class="sticky-top bg-light">
+                                        <tr><th>Date</th><th>Driver</th><th>ER No.</th><th>Request</th><th>Swiped</th><th>Issue</th></tr>
+                                    </thead>
+                                    <tbody id="discrepancyBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Timestamp -->
-        <div class="global-timestamp" id="globalTimestamp"></div>
+        <!-- PDF & export -->
+        <div class="d-flex justify-content-end mt-3 gap-2">
+            <button class="btn btn-outline-secondary rounded-pill" id="exportPdfBtn"><i class="far fa-file-pdf me-2"></i>PDF exception report</button>
+        </div>
+        <footer class="text-center mt-4 small opacity-75">
+            <i class="fas fa-sync-alt fa-spin me-1"></i> live sync to Google Sheets · logged in as Thabo
+        </footer>
     </div>
 
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // ============================================
-        // CONFIGURATION - UPDATE WITH YOUR APPS SCRIPT URL
-        // ============================================
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbylhlR-IutZ9UbdJq2bNmIiEnUmAIs2vIvtvqP0EfSNE3BcCgKIZ9159jszeFbK8DhwBQ/exec';
+        (function() {
+            // ---------- DATA MODEL with ER AMOUNT ----------
+            let fuelRecords = [];
 
-        // Department definitions with their specific tasks
-        const departments = [
-            {
-                name: "Onpoint Group HQ",
-                tasks: ["Toilets Cleaning", "Kitchen Cleaning", "Office Cleaning", "Floor Mopping", "Window Cleaning", "Carpet Vacuuming", "Surface Dusting", "Waste Removal"]
-            },
-            {
-                name: "DI Solutions",
-                tasks: ["Toilets Cleaning", "Kitchen Cleaning", "Office Cleaning", "Floor Mopping", "Window Cleaning", "Carpet Vacuuming", "Surface Dusting", "Waste Removal"]
-            },
-            {
-                name: "Aqua Telecoms",
-                tasks: ["Toilets Cleaning", "Kitchen Cleaning", "Office Cleaning", "Floor Mopping", "Window Cleaning", "Carpet Vacuuming", "Surface Dusting", "Waste Removal"]
-            },
-            {
-                name: "Nkanyezi Projects",
-                tasks: ["Toilets Cleaning", "Kitchen Cleaning", "Office Cleaning", "Floor Mopping", "Window Cleaning", "Carpet Vacuuming", "Surface Dusting", "Waste Removal"]
-            },
-            {
-                name: "Onpoint Ontime Solutions",
-                tasks: ["Toilets Cleaning", "Kitchen Cleaning", "Office Cleaning", "Floor Mopping", "Window Cleaning", "Carpet Vacuuming", "Surface Dusting", "Waste Removal"]
+            // seed data with erAmount field
+            function seedData() {
+                fuelRecords = [
+                    { id: '1', date: '2025-03-18', driver: 'Moses', department: 'Fleet', costCenter: 'Onpoint Group HQ', erNo: 'ER-101', erAmount: 250.00, swipeAmount: 245.75 },
+                    { id: '2', date: '2025-03-18', driver: 'Paul', department: 'Operations', costCenter: 'DI Solutions', erNo: 'ER-102', erAmount: 190.00, swipeAmount: 189.30 },
+                    { id: '3', date: '2025-03-19', driver: 'Nkanyeko', department: 'Warehouse', costCenter: 'Aqua Telecoms', erNo: '0', erAmount: 0, swipeAmount: 312.20 },
+                    { id: '4', date: '2025-03-19', driver: 'Thebo', department: 'Sales', costCenter: 'Nkanyezi Projects', erNo: 'ER-104', erAmount: 100.00, swipeAmount: 98.40 },
+                    { id: '5', date: '2025-03-20', driver: 'Tebello', department: 'Finance & IT', costCenter: 'Onpoint Ontime Solutions', erNo: 'ER-105', erAmount: 570.00, swipeAmount: 567.80 },
+                    { id: '6', date: '2025-03-20', driver: 'Michael', department: 'Fleet', costCenter: 'Onpoint Group HQ', erNo: '0', erAmount: 0, swipeAmount: 110.25 },
+                    { id: '7', date: '2025-03-21', driver: 'Devon', department: 'Procurements', costCenter: 'DI Solutions', erNo: 'ER-107', erAmount: 78.00, swipeAmount: 76.50 },
+                    { id: '8', date: '2025-03-21', driver: 'Joseph', department: 'SHEQ', costCenter: 'Aqua Telecoms', erNo: 'ER-108', erAmount: 430.00, swipeAmount: 424.90 },
+                    { id: '9', date: '2025-03-22', driver: 'Moses', department: 'Fleet', costCenter: 'Nkanyezi Projects', erNo: '0', erAmount: 0, swipeAmount: 60.00 },
+                    { id: '10',date: '2025-03-22', driver: 'Paul', department: 'Tendering', costCenter: 'Onpoint Ontime Solutions', erNo: 'ER-110', erAmount: 135.00, swipeAmount: 133.25 },
+                ];
             }
-        ];
+            seedData();
 
-        // Store active timers and records
-        const timers = {};
-        const timeRecords = {};
-        let completedTasksCount = 0;
-        let inProgressCount = 0;
+            let chartInstance = null;
+            let currentFilter = 'all'; // 'all', 'approved', 'notApproved'
 
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-        function initializeApp() {
-            initializeDepartments();
-            updateGlobalTimestamp();
-            setInterval(updateGlobalTimestamp, 1000);
-            setInterval(updateStatistics, 1000);
+            function generateId() { return Date.now() + '-' + Math.random().toString(36); }
 
-            // Set default date
-            const today = new Date();
-            document.getElementById('workDate').value = today.toISOString().split('T')[0];
-            
-            // Set default shift times
-            document.getElementById('shiftStart').value = '08:00';
-            document.getElementById('shiftEnd').value = '17:00';
-        }
+            // get filtered records based on currentFilter + search
+            function getFilteredRecords() {
+                const search = document.getElementById('searchInput').value.trim().toLowerCase();
+                let filtered = fuelRecords.filter(r => 
+                    r.driver.toLowerCase().includes(search) ||
+                    r.department.toLowerCase().includes(search) ||
+                    r.costCenter.toLowerCase().includes(search) ||
+                    (r.erNo && r.erNo.toLowerCase().includes(search))
+                );
 
-        function initializeDepartments() {
-            const container = document.getElementById('departmentsContainer');
-            container.innerHTML = '';
-
-            departments.forEach((dept, deptIndex) => {
-                const deptCard = createDepartmentCard(dept, deptIndex);
-                container.appendChild(deptCard);
-            });
-        }
-
-        function createDepartmentCard(department, deptIndex) {
-            const card = document.createElement('div');
-            card.className = 'department-card';
-            card.id = `dept-${deptIndex}`;
-
-            // Header
-            const header = document.createElement('div');
-            header.className = 'department-header';
-            header.innerHTML = `
-                <h3>${department.name}</h3>
-                <div class="staff-assign" id="staff-${deptIndex}">
-                    Assigned to: <span id="assigned-staff-${deptIndex}">Not assigned</span>
-                </div>
-            `;
-            card.appendChild(header);
-
-            // Tasks list
-            const tasksDiv = document.createElement('div');
-            tasksDiv.className = 'tasks-list';
-            
-            department.tasks.forEach((task, taskIndex) => {
-                const taskId = `task-${deptIndex}-${taskIndex}`;
-                const taskDiv = createTaskItem(task, deptIndex, taskIndex, taskId);
-                tasksDiv.appendChild(taskDiv);
-                
-                // Initialize timer data
-                timers[taskId] = {
-                    startTime: null,
-                    endTime: null,
-                    elapsedSeconds: 0,
-                    isRunning: false,
-                    interval: null
-                };
-                
-                timeRecords[taskId] = [];
-            });
-            
-            card.appendChild(tasksDiv);
-
-            // Submit button
-            const submitDiv = document.createElement('div');
-            submitDiv.className = 'department-submit';
-            submitDiv.innerHTML = `
-                <button class="btn-submit-department" onclick="submitDepartmentTasks(${deptIndex})">
-                    📤 Submit ${department.name} Tasks
-                </button>
-                <div id="status-${deptIndex}" class="status-message"></div>
-            `;
-            card.appendChild(submitDiv);
-
-            return card;
-        }
-
-        function createTaskItem(task, deptIndex, taskIndex, taskId) {
-            const taskDiv = document.createElement('div');
-            taskDiv.className = 'task-item';
-            taskDiv.id = taskId;
-
-            taskDiv.innerHTML = `
-                <div class="task-header">
-                    <span class="task-name">${task}</span>
-                    <span class="timer-display" id="${taskId}-timer">00:00:00</span>
-                </div>
-                <div class="time-controls">
-                    <button class="btn-start" onclick="startTimer('${taskId}')" id="${taskId}-start">▶ Start</button>
-                    <button class="btn-stop" onclick="stopTimer('${taskId}')" id="${taskId}-stop" disabled>⏹ Stop</button>
-                </div>
-                <div class="time-records" id="${taskId}-records">
-                    <div class="time-record">No completed sessions yet</div>
-                </div>
-            `;
-
-            return taskDiv;
-        }
-
-        // ============================================
-        // TIMER FUNCTIONS
-        // ============================================
-        function startTimer(taskId) {
-            const staffName = document.getElementById('staffName').value;
-            if (!staffName) {
-                alert('Please select a staff name first');
-                return;
-            }
-
-            const timer = timers[taskId];
-            if (timer.isRunning) return;
-
-            timer.startTime = new Date();
-            timer.isRunning = true;
-            timer.interval = setInterval(() => updateTimerDisplay(taskId), 1000);
-
-            // Update UI
-            document.getElementById(`${taskId}-start`).disabled = true;
-            document.getElementById(`${taskId}-stop`).disabled = false;
-
-            // Update assigned staff
-            const deptIndex = taskId.split('-')[1];
-            document.getElementById(`assigned-staff-${deptIndex}`).textContent = staffName;
-            
-            // Update statistics
-            inProgressCount++;
-            updateStatistics();
-        }
-
-        function stopTimer(taskId) {
-            const timer = timers[taskId];
-            if (!timer.isRunning) return;
-
-            timer.endTime = new Date();
-            timer.isRunning = false;
-            clearInterval(timer.interval);
-
-            // Calculate elapsed time
-            const elapsedMs = timer.endTime - timer.startTime;
-            timer.elapsedSeconds = Math.floor(elapsedMs / 1000);
-
-            // Record this session with ALL data
-            recordTaskSession(taskId);
-
-            // Update UI
-            document.getElementById(`${taskId}-start`).disabled = false;
-            document.getElementById(`${taskId}-stop`).disabled = true;
-
-            // Reset timer display
-            updateTimerDisplay(taskId, true);
-            
-            // Update statistics
-            inProgressCount--;
-            completedTasksCount++;
-            updateStatistics();
-        }
-
-        function updateTimerDisplay(taskId, reset = false) {
-            const timer = timers[taskId];
-            const display = document.getElementById(`${taskId}-timer`);
-            
-            if (reset) {
-                display.textContent = '00:00:00';
-                return;
-            }
-
-            if (timer && timer.isRunning) {
-                const now = new Date();
-                const elapsedMs = now - timer.startTime;
-                const seconds = Math.floor(elapsedMs / 1000);
-                const hours = Math.floor(seconds / 3600);
-                const minutes = Math.floor((seconds % 3600) / 60);
-                const secs = seconds % 60;
-                
-                display.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-            }
-        }
-
-        // ============================================
-        // RECORD KEEPING - Collects ALL form data
-        // ============================================
-        function recordTaskSession(taskId) {
-            const timer = timers[taskId];
-            const staffName = document.getElementById('staffName').value;
-            const employeeId = document.getElementById('employeeId').value;
-            const workDate = document.getElementById('workDate').value;
-            const shiftStart = document.getElementById('shiftStart').value;
-            const shiftEnd = document.getElementById('shiftEnd').value;
-            const workLocation = document.getElementById('workLocation').value;
-            const supervisor = document.getElementById('supervisor').value;
-            const globalNotes = document.getElementById('globalNotes').value;
-            
-            // Get task details from taskId
-            const [_, deptIndex, taskIndex] = taskId.split('-');
-            const department = departments[parseInt(deptIndex)].name;
-            const taskName = departments[parseInt(deptIndex)].tasks[parseInt(taskIndex)];
-
-            // Create complete session record with ALL fields
-            const session = {
-                // Staff Info
-                staffName: staffName,
-                employeeId: employeeId,
-                
-                // Task Info
-                department: department,
-                taskName: taskName,
-                
-                // Timing
-                startTime: timer.startTime,
-                endTime: timer.endTime,
-                durationSeconds: timer.elapsedSeconds,
-                durationMinutes: Math.round(timer.elapsedSeconds / 60),
-                durationHours: (timer.elapsedSeconds / 3600).toFixed(2),
-                
-                // Work Details
-                workDate: workDate,
-                shiftStart: shiftStart,
-                shiftEnd: shiftEnd,
-                workLocation: workLocation,
-                supervisor: supervisor,
-                
-                // Additional
-                notes: globalNotes,
-                taskNotes: '', // Can be added per task if needed
-                
-                // Metadata
-                submissionTimestamp: new Date().toISOString(),
-                taskId: taskId
-            };
-
-            // Store the session
-            if (!timeRecords[taskId]) {
-                timeRecords[taskId] = [];
-            }
-            timeRecords[taskId].push(session);
-            
-            // Update display
-            updateRecordsDisplay(taskId);
-        }
-
-        function updateRecordsDisplay(taskId) {
-            const records = timeRecords[taskId] || [];
-            const recordsDiv = document.getElementById(`${taskId}-records`);
-            
-            if (records.length === 0) {
-                recordsDiv.innerHTML = '<div class="time-record">No completed sessions yet</div>';
-                return;
-            }
-
-            let html = '';
-            records.slice(-3).reverse().forEach(record => {
-                html += `
-                    <div class="time-record">
-                        <span>${record.staffName}</span>
-                        <span>${record.durationMinutes}m</span>
-                    </div>
-                `;
-            });
-            
-            recordsDiv.innerHTML = html;
-        }
-
-        // ============================================
-        // SUBMISSION FUNCTIONS - Sends ALL data to Google Sheets
-        // ============================================
-        async function submitDepartmentTasks(deptIndex) {
-            const department = departments[deptIndex];
-            const staffName = document.getElementById('staffName').value;
-            const statusDiv = document.getElementById(`status-${deptIndex}`);
-            
-            if (!staffName) {
-                showStatus(statusDiv, '❌ Please select a staff name', 'error');
-                return;
-            }
-
-            // Collect ALL task data for this department
-            const taskData = [];
-            let totalTasks = 0;
-            
-            department.tasks.forEach((task, taskIndex) => {
-                const taskId = `task-${deptIndex}-${taskIndex}`;
-                const sessions = timeRecords[taskId] || [];
-                
-                sessions.forEach(session => {
-                    taskData.push({
-                        // Staff Information
-                        staffName: session.staffName,
-                        employeeId: session.employeeId,
-                        
-                        // Department & Task
-                        department: session.department,
-                        taskName: session.taskName,
-                        
-                        // Timing Data
-                        startTime: session.startTime,
-                        endTime: session.endTime,
-                        durationSeconds: session.durationSeconds,
-                        durationMinutes: session.durationMinutes,
-                        durationHours: session.durationHours,
-                        
-                        // Work Details
-                        workDate: session.workDate,
-                        shiftStart: session.shiftStart,
-                        shiftEnd: session.shiftEnd,
-                        workLocation: session.workLocation,
-                        supervisor: session.supervisor,
-                        
-                        // Notes
-                        notes: session.notes,
-                        taskNotes: session.taskNotes,
-                        
-                        // Metadata
-                        submittedBy: staffName,
-                        submissionTime: new Date().toISOString()
-                    });
-                    totalTasks++;
-                });
-            });
-
-            if (taskData.length === 0) {
-                showStatus(statusDiv, '❌ No completed tasks to submit', 'error');
-                return;
-            }
-
-            // Submit to Google Sheets
-            await submitToGoogleSheets({
-                type: 'department_submission',
-                department: department.name,
-                tasks: taskData,
-                submittedBy: staffName,
-                totalTasks: totalTasks,
-                timestamp: new Date().toISOString(),
-                
-                // Include global form data
-                globalData: {
-                    staffName: staffName,
-                    employeeId: document.getElementById('employeeId').value,
-                    workDate: document.getElementById('workDate').value,
-                    shiftStart: document.getElementById('shiftStart').value,
-                    shiftEnd: document.getElementById('shiftEnd').value,
-                    workLocation: document.getElementById('workLocation').value,
-                    supervisor: document.getElementById('supervisor').value,
-                    globalNotes: document.getElementById('globalNotes').value
+                if (currentFilter === 'approved') {
+                    filtered = filtered.filter(r => r.erNo && r.erNo !== '0');
+                } else if (currentFilter === 'notApproved') {
+                    filtered = filtered.filter(r => !r.erNo || r.erNo === '0');
                 }
-            }, statusDiv, deptIndex);
-        }
-
-        async function submitAllDepartments() {
-            const globalStatus = document.getElementById('globalStatus');
-            const staffName = document.getElementById('staffName').value;
-            
-            if (!staffName) {
-                showStatus(globalStatus, '❌ Please select a staff name', 'error');
-                return;
+                return filtered;
             }
 
-            let allTasks = [];
-            let totalCount = 0;
+            // update all UI: KPI, chart, tables, variance totals
+            function refreshUI() {
+                // KPI (unfiltered)
+                document.getElementById('totalSwipes').innerText = fuelRecords.length;
+                document.getElementById('totalApproved').innerText = fuelRecords.filter(r => r.erNo && r.erNo !== '0').length;
+                document.getElementById('totalNoEr').innerText = fuelRecords.filter(r => !r.erNo || r.erNo === '0').length;
+                const totalVar = fuelRecords.reduce((acc, r) => acc + (r.swipeAmount - (r.erAmount || 0)), 0);
+                document.getElementById('totalVariance').innerText = '$' + totalVar.toFixed(2);
 
-            // Collect data from all departments
-            departments.forEach((dept, deptIndex) => {
-                dept.tasks.forEach((task, taskIndex) => {
-                    const taskId = `task-${deptIndex}-${taskIndex}`;
-                    const sessions = timeRecords[taskId] || [];
-                    
-                    sessions.forEach(session => {
-                        allTasks.push(session);
-                        totalCount++;
-                    });
-                });
-            });
+                // filtered records
+                const filtered = getFilteredRecords();
+                const totalRequested = filtered.reduce((acc, r) => acc + (r.erAmount || 0), 0);
+                const totalSwiped = filtered.reduce((acc, r) => acc + r.swipeAmount, 0);
+                const variance = totalSwiped - totalRequested;
 
-            if (allTasks.length === 0) {
-                showStatus(globalStatus, '❌ No completed tasks to submit', 'error');
-                return;
-            }
+                document.getElementById('totalRequested').innerText = '$' + totalRequested.toFixed(2);
+                document.getElementById('totalSwipedFilter').innerText = '$' + totalSwiped.toFixed(2);
+                document.getElementById('varianceAmount').innerText = (variance >= 0 ? '+' : '') + variance.toFixed(2);
+                const maxBar = Math.max(totalRequested, totalSwiped, 1);
+                const barPercent = Math.min(100, (variance > 0 ? totalSwiped/maxBar : totalRequested/maxBar)*100);
+                document.getElementById('varianceBar').style.width = barPercent + '%';
 
-            // Submit all at once
-            await submitToGoogleSheets({
-                type: 'bulk_submission',
-                tasks: allTasks,
-                submittedBy: staffName,
-                totalTasks: totalCount,
-                timestamp: new Date().toISOString(),
-                globalData: {
-                    staffName: staffName,
-                    employeeId: document.getElementById('employeeId').value,
-                    workDate: document.getElementById('workDate').value,
-                    shiftStart: document.getElementById('shiftStart').value,
-                    shiftEnd: document.getElementById('shiftEnd').value,
-                    workLocation: document.getElementById('workLocation').value,
-                    supervisor: document.getElementById('supervisor').value,
-                    globalNotes: document.getElementById('globalNotes').value
-                }
-            }, globalStatus);
-        }
+                // chart data: approved vs not approved (filtered sums)
+                const approvedSum = filtered.filter(r => r.erNo && r.erNo !== '0').reduce((a, r) => a + r.swipeAmount, 0);
+                const notApprovedSum = filtered.filter(r => !r.erNo || r.erNo === '0').reduce((a, r) => a + r.swipeAmount, 0);
 
-        async function submitToGoogleSheets(data, statusDiv, deptIndex = null) {
-            try {
-                showStatus(statusDiv, 'Submitting...', 'info');
-                
-                console.log('Submitting data to Google Sheets:', data);
-
-                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 
-                        'Content-Type': 'application/json'
+                if (chartInstance) chartInstance.destroy();
+                const ctx = document.getElementById('reconChart').getContext('2d');
+                chartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Approved (ER>0)', 'Not approved (ER=0)'],
+                        datasets: [{
+                            data: [approvedSum, notApprovedSum],
+                            backgroundColor: ['#2e6b2e', '#a66907'],
+                            borderWidth: 0
+                        }]
                     },
-                    body: JSON.stringify(data)
+                    options: { cutout: '65%', plugins: { legend: { display: false } } }
                 });
 
-                showStatus(statusDiv, `✅ ${data.totalTasks || data.tasks.length} tasks submitted successfully!`, 'success');
-                
-                // Clear submitted sessions if it was a department submission
-                if (deptIndex !== null) {
-                    clearDepartmentSessions(deptIndex);
-                }
-                
-                // Update statistics
-                updateStatistics();
+                // all records table
+                const allBody = document.getElementById('allRecordsBody');
+                let allHtml = '';
+                filtered.forEach(rec => {
+                    const varianceVal = (rec.swipeAmount - (rec.erAmount || 0)).toFixed(2);
+                    const status = (rec.erNo && rec.erNo !== '0') ? '<span class="badge-approved">approved</span>' : '<span class="badge-missing">not approved</span>';
+                    allHtml += `<tr>
+                        <td>${rec.date}</td><td>${rec.driver}</td><td>${rec.erNo || '0'}</td>
+                        <td>$${(rec.erAmount || 0).toFixed(2)}</td><td>$${rec.swipeAmount.toFixed(2)}</td>
+                        <td class="${varianceVal < 0 ? 'text-danger' : 'text-success'}">${varianceVal}</td>
+                        <td>${status}</td>
+                    </tr>`;
+                });
+                allBody.innerHTML = allHtml || '<tr><td colspan="7" class="text-center">no records</td></tr>';
 
-            } catch (error) {
-                console.error('Submission error:', error);
-                showStatus(statusDiv, '❌ Submission failed: ' + error.message, 'error');
-            }
-        }
-
-        // ============================================
-        // UTILITY FUNCTIONS
-        // ============================================
-        function showStatus(element, message, type) {
-            element.className = 'status-message ' + type;
-            element.textContent = message;
-            element.style.display = 'block';
-            
-            if (type !== 'info') {
-                setTimeout(() => {
-                    element.style.display = 'none';
-                }, 5000);
-            }
-        }
-
-        function clearDepartmentSessions(deptIndex) {
-            const department = departments[deptIndex];
-            department.tasks.forEach((task, taskIndex) => {
-                const taskId = `task-${deptIndex}-${taskIndex}`;
-                timeRecords[taskId] = [];
-                updateRecordsDisplay(taskId);
-            });
-        }
-
-        function resetAllTimers() {
-            if (confirm('Are you sure you want to reset all timers and clear all records?')) {
-                // Reset all timers
-                Object.keys(timers).forEach(taskId => {
-                    const timer = timers[taskId];
-                    if (timer.interval) {
-                        clearInterval(timer.interval);
+                // discrepancy table: erNo == 0 OR variance > 0.5 (significant)
+                let discHtml = '';
+                filtered.forEach(rec => {
+                    const isApproved = (rec.erNo && rec.erNo !== '0');
+                    const varianceVal = rec.swipeAmount - (rec.erAmount || 0);
+                    if (!isApproved) {
+                        discHtml += `<tr class="table-warning"><td>${rec.date}</td><td>${rec.driver}</td><td>0</td>
+                            <td>$0</td><td>$${rec.swipeAmount.toFixed(2)}</td><td><span class="badge-missing">no ER (not approved)</span></td></tr>`;
+                    } else if (Math.abs(varianceVal) > 0.5) {  // variance threshold
+                        discHtml += `<tr class="table-danger"><td>${rec.date}</td><td>${rec.driver}</td><td>${rec.erNo}</td>
+                            <td>$${(rec.erAmount || 0).toFixed(2)}</td><td>$${rec.swipeAmount.toFixed(2)}</td>
+                            <td><span class="badge-mismatch">variance ${varianceVal > 0 ? '+' : ''}${varianceVal.toFixed(2)}</span></td></tr>`;
                     }
-                    timer.isRunning = false;
-                    timer.startTime = null;
-                    timer.endTime = null;
-                    timer.elapsedSeconds = 0;
-                    
-                    // Reset UI
-                    document.getElementById(`${taskId}-start`).disabled = false;
-                    document.getElementById(`${taskId}-stop`).disabled = true;
-                    document.getElementById(`${taskId}-timer`).textContent = '00:00:00';
                 });
-                
-                // Clear all records
-                Object.keys(timeRecords).forEach(taskId => {
-                    timeRecords[taskId] = [];
-                    updateRecordsDisplay(taskId);
-                });
-                
-                // Reset counts
-                completedTasksCount = 0;
-                inProgressCount = 0;
-                updateStatistics();
-                
-                showStatus(document.getElementById('globalStatus'), '✅ All timers reset', 'success');
+                discBody.innerHTML = discHtml || '<tr><td colspan="6" class="text-center">✨ no exceptions</td></tr>';
             }
-        }
 
-        function exportAllData() {
-            const data = {
-                staffInfo: {
-                    staffName: document.getElementById('staffName').value,
-                    employeeId: document.getElementById('employeeId').value,
-                    workDate: document.getElementById('workDate').value,
-                    shiftStart: document.getElementById('shiftStart').value,
-                    shiftEnd: document.getElementById('shiftEnd').value,
-                    workLocation: document.getElementById('workLocation').value,
-                    supervisor: document.getElementById('supervisor').value,
-                    globalNotes: document.getElementById('globalNotes').value
-                },
-                taskRecords: timeRecords,
-                exportTime: new Date().toISOString()
-            };
-            
-            const jsonStr = JSON.stringify(data, null, 2);
-            const blob = new Blob([jsonStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `cleaning-data-${new Date().toISOString()}.json`;
-            a.click();
-            
-            showStatus(document.getElementById('globalStatus'), '✅ Data exported successfully', 'success');
-        }
+            // ---------- send to google sheet (simulated) ----------
+            function sendToGoogleSheets(record) {
+                console.log('Apps Script send: ', record);
+                // In production: use fetch
+            }
 
-        function updateStatistics() {
-            document.getElementById('completedTasks').textContent = completedTasksCount;
-            document.getElementById('inProgressTasks').textContent = inProgressCount;
-            
-            const staffName = document.getElementById('staffName').value;
-            document.getElementById('staffOnDuty').textContent = staffName ? '1' : '0';
-            
-            // Calculate total tasks (5 departments * 8 tasks)
-            document.getElementById('totalTasks').textContent = departments.length * 8;
-        }
+            // add new swipe with ER Amount
+            document.getElementById('addSwipeBtn').addEventListener('click', function() {
+                const date = document.getElementById('swipeDate').value;
+                const costCenter = document.getElementById('costCenter').value;
+                const department = document.getElementById('department').value;
+                const driver = document.getElementById('driverName').value;
+                let erNo = document.getElementById('erNo').value.trim();
+                if (erNo === '') erNo = '0';
+                const erAmount = parseFloat(document.getElementById('erAmount').value) || 0;
+                const swipeAmount = parseFloat(document.getElementById('swipeAmount').value);
+                if (!date || isNaN(swipeAmount)) { alert('fill date and swipe amount'); return; }
 
-        function updateGlobalTimestamp() {
-            const now = new Date();
-            document.getElementById('globalTimestamp').textContent = 
-                `Last updated: ${now.toLocaleString('en-ZA', { timeZone: 'Africa/Johannesburg' })}`;
-        }
+                const newRecord = {
+                    id: generateId(),
+                    date, driver, department, costCenter,
+                    erNo: erNo,
+                    erAmount: erAmount,
+                    swipeAmount: swipeAmount
+                };
+                fuelRecords.push(newRecord);
+                sendToGoogleSheets(newRecord);
 
-        // ============================================
-        // EVENT LISTENERS
-        // ============================================
-        document.getElementById('staffName').addEventListener('change', updateStatistics);
+                document.getElementById('erNo').value = '';
+                document.getElementById('erAmount').value = '';
+                document.getElementById('swipeAmount').value = '';
 
-        // Initialize on page load
-        window.onload = initializeApp;
+                refreshUI();
+            });
+
+            // filter chips
+            document.getElementById('filterAll').addEventListener('click', function() {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active'); currentFilter = 'all'; refreshUI();
+            });
+            document.getElementById('filterApproved').addEventListener('click', function() {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active'); currentFilter = 'approved'; refreshUI();
+            });
+            document.getElementById('filterNotApproved').addEventListener('click', function() {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active'); currentFilter = 'notApproved'; refreshUI();
+            });
+
+            // search
+            document.getElementById('searchInput').addEventListener('input', refreshUI);
+            document.getElementById('clearSearch').addEventListener('click', function() {
+                document.getElementById('searchInput').value = '';
+                refreshUI();
+            });
+
+            // PDF export
+            document.getElementById('exportPdfBtn').addEventListener('click', function() {
+                const discRows = document.getElementById('discrepancyBody').innerHTML;
+                const html = `
+                    <div style="padding:25px; font-family:Inter;">
+                        <h2 style="color:#0b2b4a;">Onpoint Group · exception report</h2>
+                        <p>${new Date().toLocaleString()} | logged in: Thabo M.</p>
+                        <table border="1" cellpadding="6" style="border-collapse:collapse; width:100%">
+                            <thead><tr><th>Date</th><th>Driver</th><th>ER No.</th><th>Request</th><th>Swiped</th><th>Issue</th></tr></thead>
+                            <tbody>${discRows}</tbody>
+                        </table>
+                    </div>`;
+                const el = document.createElement('div');
+                el.innerHTML = html;
+                document.body.appendChild(el);
+                html2pdf().from(el).set({ filename: 'Onpoint_exceptions.pdf', margin: 0.5 }).save().then(() => document.body.removeChild(el));
+            });
+
+            // initial render
+            refreshUI();
+        })();
     </script>
 </body>
 </html>
